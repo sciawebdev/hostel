@@ -14,6 +14,7 @@ import { useComplaints } from '../hooks/useComplaints'
 import { useCostApprovals } from '../hooks/useRoleBasedWorkflow'
 import { COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
 import { ComplaintsList } from './ComplaintsList'
+import { CostApprovalsList } from './CostApprovalsList'
 import { AdminComplaintManagement } from './AdminComplaintManagement'
 import { DashboardStats } from './DashboardStats'
 
@@ -25,7 +26,7 @@ export function AdminRoleDashboard() {
   const [selectedHostel, setSelectedHostel] = useState<string>('all')
   const { user, logout } = useAuth()
   const { data: complaints = [], isLoading } = useComplaints()
-  const { data: costApprovals = [] } = useCostApprovals()
+  const { data: costApprovals = [], isLoading: approvalsLoading } = useCostApprovals()
 
   const filteredComplaints = useMemo(() => {
     let filtered = complaints
@@ -82,6 +83,14 @@ export function AdminRoleDashboard() {
           <h3 className="text-lg font-medium text-gray-900 mb-4">System Analytics</h3>
           <p className="text-gray-600">Advanced analytics and reporting features coming soon...</p>
         </div>
+      )
+    }
+    if (activeTab === 'cost-approvals') {
+      return (
+        <CostApprovalsList
+          costApprovals={costApprovals}
+          isLoading={approvalsLoading}
+        />
       )
     }
     return (
