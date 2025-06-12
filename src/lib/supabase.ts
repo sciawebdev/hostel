@@ -6,13 +6,19 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: false, // Disable session persistence for kiosk mode
-    autoRefreshToken: false,
+    persistSession: true, // Enable session persistence for mobile
+    autoRefreshToken: true, // Enable token refresh
+    detectSessionInUrl: false, // Disable for mobile
+    storage: localStorage, // Use localStorage for persistence
   },
   global: {
     headers: {
-      'X-Client-Info': 'hostel-management-kiosk',
+      'X-Client-Info': 'hostel-management-mobile-app',
+      'Content-Type': 'application/json',
     },
+  },
+  db: {
+    schema: 'public',
   },
 })
 
