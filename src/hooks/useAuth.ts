@@ -2,7 +2,7 @@
 // Please import useAuth from AuthProvider.tsx instead 
 
 // Custom hooks for accessing demo users and role-based functionality
-import { getCampusInChargeUsers, getHostelWardens } from '../components/AuthProvider'
+import { getCampusInChargeUsers, getFloorIncharges } from '../components/AuthProvider'
 import { useState, useEffect, useContext, createContext } from 'react'
 import { supabase, type Complaint } from '../lib/supabase'
 import type { UserRole, Permission, CostApproval, WardenAuthentication, ComplaintAssignment, ComplaintActivity, WorkProgressUpdate } from '../types/auth'
@@ -16,10 +16,10 @@ export function useCampusInChargeUsers() {
   }
 }
 
-// Hook to get hostel wardens
-export function useHostelWardens(hostelId?: string) {
+// Hook to get floor incharges
+export function useFloorIncharges(hostelId?: string) {
   return {
-    data: getHostelWardens(hostelId),
+    data: getFloorIncharges(hostelId),
     isLoading: false,
     error: null
   }
@@ -28,10 +28,10 @@ export function useHostelWardens(hostelId?: string) {
 // Hook to get all users (for admin)
 export function useUsers() {
   const campusUsers = getCampusInChargeUsers()
-  const wardens = getHostelWardens()
+  const floorIncharges = getFloorIncharges()
   
   return {
-    data: [...campusUsers, ...wardens],
+    data: [...campusUsers, ...floorIncharges],
     isLoading: false,
     error: null
   }

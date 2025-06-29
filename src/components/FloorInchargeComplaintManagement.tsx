@@ -1,38 +1,38 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { ArrowLeft, Shield, CheckCircle, XCircle } from 'lucide-react'
 import { useComplaint } from '../hooks/useComplaints'
-import { useWardenVerification } from '../hooks/useRoleBasedWorkflow'
+import { useFloorInchargeVerification } from '../hooks/useRoleBasedWorkflow'
 import { useAuth } from './AuthProvider'
 import { ComplaintDetails } from './ComplaintDetails'
 import { COMPLAINT_WORKFLOW_STATUS, supabase } from '../lib/supabase'
 import { toast } from 'sonner'
 
-interface WardenComplaintManagementProps {
+interface FloorInchargeComplaintManagementProps {
   complaintId: string
   onBack: () => void
 }
 
-export function WardenComplaintManagement({ complaintId, onBack }: WardenComplaintManagementProps) {
+export function FloorInchargeComplaintManagement({ complaintId, onBack }: FloorInchargeComplaintManagementProps) {
   const [activeTab, setActiveTab] = useState<'details' | 'verify' | 'work-verify'>('details')
   const [verificationNotes, setVerificationNotes] = useState('')
   const [workVerificationNotes, setWorkVerificationNotes] = useState('')
   const [studentSignatureObtained, setStudentSignatureObtained] = useState(false)
   const [workSatisfactory, setWorkSatisfactory] = useState('')
-  const [hasWardenVerified, setHasWardenVerified] = useState(false)
+  const [hasFloorInchargeVerified, setHasFloorInchargeVerified] = useState(false)
 
   const { user } = useAuth()
   const { data: complaint, isLoading } = useComplaint(complaintId)
-  const wardenVerificationMutation = useWardenVerification()
+  const floorInchargeVerificationMutation = useFloorInchargeVerification()
 
   const handleComplaintVerification = async (verified: boolean) => {
     if (!user) return
 
     try {
-      await wardenVerificationMutation.mutateAsync({
+      await floorInchargeVerificationMutation.mutateAsync({
         complaintId,
         verified,
         notes: verificationNotes,
-        wardenId: user.id
+        floorInchargeId: user.id
       })
       
       setVerificationNotes('')
@@ -59,7 +59,7 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
 
       if (updateError) throw updateError
 
-      // Create warden authentication record for work verification
+      // Create floor incharge authentication record for work verification
       const verificationData = {
         student_signature_obtained: studentSignatureObtained,
         work_satisfactory: workSatisfactory === 'yes',
@@ -70,7 +70,7 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
         .from('warden_authentications')
         .insert([{
           complaint_id: complaintId,
-          warden_id: user.id,
+          floor_incharge_id: user.id,
           is_verified: verified,
           verification_notes: JSON.stringify(verificationData),
           verified_at: new Date().toISOString()
@@ -84,8 +84,8 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
           complaint_id: complaintId,
           activity_type: verified ? 'WORK_VERIFIED' : 'WORK_REJECTED',
           description: verified 
-            ? `Work verified by warden: ${workVerificationNotes}`
-            : `Work rejected by warden: ${workVerificationNotes}`,
+            ? `Work verified by floor incharge: ${workVerificationNotes}`
+            : `Work rejected by floor incharge: ${workVerificationNotes}`,
           performed_by: user.id,
         }
       ])
@@ -95,7 +95,7 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
       setWorkVerificationNotes('')
       setStudentSignatureObtained(false)
       setWorkSatisfactory('')
-      setHasWardenVerified(true)
+      setHasFloorInchargeVerified(true)
       setActiveTab('details')
       
       toast.success(
@@ -135,7 +135,7 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
   }
 
   const canVerifyComplaint = complaint.status === COMPLAINT_WORKFLOW_STATUS.VERIFICATION_PENDING
-  const canVerifyWork = complaint.status === COMPLAINT_WORKFLOW_STATUS.WORK_VERIFICATION_PENDING && !hasWardenVerified
+  const canVerifyWork = complaint.status === COMPLAINT_WORKFLOW_STATUS.WORK_VERIFICATION_PENDING && !hasFloorInchargeVerified
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -148,7 +148,7 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
         <div className="bg-white rounded-lg shadow">
           {/* Header */}
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900">Warden Verification</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Floor Incharge Verification</h2>
             <p className="text-gray-600 mt-2">Complaint #{complaint.complaint_number}</p>
             
             {/* Tab Navigation */}
@@ -213,15 +213,15 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
                 <div className="flex space-x-4">
                   <button
                     onClick={() => handleComplaintVerification(true)}
-                    disabled={wardenVerificationMutation.isPending || !verificationNotes.trim()}
+                    disabled={floorInchargeVerificationMutation.isPending || !verificationNotes.trim()}
                     className="flex items-center px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    {wardenVerificationMutation.isPending ? 'Verifying...' : 'Verify & Auto-Assign for Cost Estimation'}
+                    {floorInchargeVerificationMutation.isPending ? 'Verifying...' : 'Verify & Auto-Assign for Cost Estimation'}
                   </button>
                   <button
                     onClick={() => handleComplaintVerification(false)}
-                    disabled={wardenVerificationMutation.isPending || !verificationNotes.trim()}
+                    disabled={floorInchargeVerificationMutation.isPending || !verificationNotes.trim()}
                     className="flex items-center px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <XCircle className="h-4 w-4 mr-2" />
@@ -231,7 +231,7 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
               </div>
             )}
 
-            {activeTab === 'work-verify' && !hasWardenVerified && (
+            {activeTab === 'work-verify' && !hasFloorInchargeVerified && (
               <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <CheckCircle className="h-6 w-6 text-blue-500" />
@@ -240,7 +240,7 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-800">
-                    <strong>🏠 Warden Role:</strong> Please verify if the work has been completed satisfactorily by checking with the student and inspecting the work area.
+                    <strong>🏠 Floor Incharge Role:</strong> Please verify if the work has been completed satisfactorily by checking with the student and inspecting the work area.
                   </p>
                 </div>
 
@@ -351,7 +351,7 @@ export function WardenComplaintManagement({ complaintId, onBack }: WardenComplai
               </div>
             )}
 
-            {activeTab === 'work-verify' && hasWardenVerified && (
+            {activeTab === 'work-verify' && hasFloorInchargeVerified && (
               <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <CheckCircle className="h-6 w-6 text-green-500" />

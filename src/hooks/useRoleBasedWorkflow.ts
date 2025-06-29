@@ -746,7 +746,7 @@ export function useComplaintActivities(complaintId: string) {
 }
 
 // Warden verification hook
-export function useWardenVerification() {
+export function useFloorInchargeVerification() {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -754,20 +754,20 @@ export function useWardenVerification() {
       complaintId, 
       verified, 
       notes, 
-      wardenId 
+      floorInchargeId 
     }: { 
       complaintId: string
       verified: boolean
       notes: string
-      wardenId: string
+      floorInchargeId: string
     }) => {
       if (verified) {
-        // Insert warden authentication record
+        // Insert floor incharge authentication record
         const { error: authError } = await supabase
           .from('warden_authentications')
           .insert([{
             complaint_id: complaintId,
-            warden_id: wardenId,
+            floor_incharge_id: floorInchargeId,
             is_verified: true,
             verification_notes: notes,
             verified_at: new Date().toISOString()
@@ -788,13 +788,13 @@ export function useWardenVerification() {
           {
             complaint_id: complaintId,
             activity_type: 'VERIFIED',
-            description: `Complaint verified by warden: ${notes}`,
-            performed_by: wardenId,
+            description: `Complaint verified by floor incharge: ${notes}`,
+            performed_by: floorInchargeId,
           }
         ])
 
         // Auto-transition to cost estimation
-        await autoTransitionWorkflow(complaintId, COMPLAINT_WORKFLOW_STATUS.VERIFIED, wardenId)
+        await autoTransitionWorkflow(complaintId, COMPLAINT_WORKFLOW_STATUS.VERIFIED, floorInchargeId)
 
       } else {
         // Reject the complaint
@@ -807,8 +807,8 @@ export function useWardenVerification() {
           {
             complaint_id: complaintId,
             activity_type: 'REJECTED',
-            description: `Complaint rejected by warden: ${notes}`,
-            performed_by: wardenId,
+            description: `Complaint rejected by floor incharge: ${notes}`,
+            performed_by: floorInchargeId,
           }
         ])
       }

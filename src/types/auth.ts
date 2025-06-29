@@ -2,7 +2,7 @@
 
 export type UserRole = {
   id: string
-  name: 'administrator' | 'campus_in_charge' | 'hostel_warden'
+  name: 'administrator' | 'campus_in_charge' | 'floor_incharge'
   description: string
   permissions: {
     view_all_complaints?: boolean

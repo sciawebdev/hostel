@@ -5,10 +5,8 @@ const config: CapacitorConfig = {
   appName: 'sca hostel',
   webDir: 'dist',
   server: {
-    androidScheme: 'http',
-    hostname: '192.168.0.103',
-    port: 3002,
-    cleartext: true,
+    androidScheme: 'https',
+    url: 'https://hostel-gray.vercel.app/kiosk'
   },
 }
 

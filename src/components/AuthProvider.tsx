@@ -22,7 +22,7 @@ const demoUsers: User[] = [
   // Administrator
   {
     id: 'admin-1',
-    email: 'admin@hostel.edu',
+    email: 'admin@saratchandra.co.in',
     name: 'System Administrator',
     contact: '+91-9876543210',
     role_id: 'admin-role',
@@ -50,7 +50,7 @@ const demoUsers: User[] = [
   // Campus Coordinators
   {
     id: 'campus-coord-1',
-    email: 'coord1@hostel.edu',
+    email: 'coord1@saratchandra.co.in',
     name: 'Ravi Kumar',
     contact: '+91-9876543211',
     role_id: 'campus-ic-role',
@@ -77,7 +77,7 @@ const demoUsers: User[] = [
 
   {
     id: 'campus-coord-2',
-    email: 'coord2@hostel.edu',
+    email: 'coord2@saratchandra.co.in',
     name: 'Priya Sharma',
     contact: '+91-9876543212',
     role_id: 'campus-ic-role',
@@ -104,7 +104,7 @@ const demoUsers: User[] = [
 
   {
     id: 'campus-coord-3',
-    email: 'coord3@hostel.edu',
+    email: 'coord3@saratchandra.co.in',
     name: 'Amit Patel',
     contact: '+91-9876543213',
     role_id: 'campus-ic-role',
@@ -131,7 +131,7 @@ const demoUsers: User[] = [
 
   {
     id: 'campus-coord-4',
-    email: 'coord4@hostel.edu',
+    email: 'coord4@saratchandra.co.in',
     name: 'Sunita Rao',
     contact: '+91-9876543214',
     role_id: 'campus-ic-role',
@@ -158,7 +158,7 @@ const demoUsers: User[] = [
 
   {
     id: 'campus-coord-5',
-    email: 'coord5@hostel.edu',
+    email: 'coord5@saratchandra.co.in',
     name: 'Vikram Singh',
     contact: '+91-9876543215',
     role_id: 'campus-ic-role',
@@ -185,7 +185,7 @@ const demoUsers: User[] = [
 
   {
     id: 'campus-coord-6',
-    email: 'coord6@hostel.edu',
+    email: 'coord6@saratchandra.co.in',
     name: 'Meera Gupta',
     contact: '+91-9876543216',
     role_id: 'campus-ic-role',
@@ -212,11 +212,11 @@ const demoUsers: User[] = [
 
   {
     id: 'campus-coord-7',
-    email: 'coord7@hostel.edu',
+    email: 'coord7@saratchandra.co.in',
     name: 'Arjun Nair',
     contact: '+91-9876543217',
     role_id: 'campus-ic-role',
-    specialization: 'Benz Circle Hostel Coordinator',
+    specialization: 'Campus Coordinator',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
@@ -237,22 +237,22 @@ const demoUsers: User[] = [
     }
   },
 
-  // Wardens
+  // Floor Incharges (formerly Wardens)
   {
-    id: 'warden-godavari',
-    email: 'warden1@hostel.edu',
-    name: 'Dr. Priya Sharma',
+    id: 'floor-incharge-godavari',
+    email: 'floor-incharge-godavari@saratchandra.co.in',
+    name: 'Floor Incharge - Godavari',
     contact: '+91-9876543221',
-    role_id: 'warden-role',
-    specialization: 'Godavari Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Godavari Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -265,20 +265,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-sarayu',
-    email: 'warden2@hostel.edu',
-    name: 'Prof. Rajesh Kumar',
+    id: 'floor-incharge-sarayu',
+    email: 'floor-incharge-sarayu@saratchandra.co.in',
+    name: 'Floor Incharge - Sarayu',
     contact: '+91-9876543222',
-    role_id: 'warden-role',
-    specialization: 'Sarayu Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Sarayu Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -291,20 +291,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-ganga1',
-    email: 'warden3@hostel.edu',
-    name: 'Dr. Meera Patel',
+    id: 'floor-incharge-ganga1',
+    email: 'floor-incharge-ganga1@saratchandra.co.in',
+    name: 'Floor Incharge - Ganga 1',
     contact: '+91-9876543223',
-    role_id: 'warden-role',
-    specialization: 'Ganga 1 Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Ganga 1 Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -317,20 +317,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-ganga2',
-    email: 'warden4@hostel.edu',
-    name: 'Prof. Vikram Singh',
+    id: 'floor-incharge-ganga2',
+    email: 'floor-incharge-ganga2@saratchandra.co.in',
+    name: 'Floor Incharge - Ganga 2',
     contact: '+91-9876543224',
-    role_id: 'warden-role',
-    specialization: 'Ganga 2 Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Ganga 2 Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -343,20 +343,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-krishna',
-    email: 'warden5@hostel.edu',
-    name: 'Dr. Sunita Rao',
+    id: 'floor-incharge-krishna',
+    email: 'floor-incharge-krishna@saratchandra.co.in',
+    name: 'Floor Incharge - Krishna',
     contact: '+91-9876543225',
-    role_id: 'warden-role',
-    specialization: 'Krishna Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Krishna Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -369,20 +369,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-brahmaputra1',
-    email: 'warden6@hostel.edu',
-    name: 'Prof. Amit Joshi',
+    id: 'floor-incharge-brahmaputra1',
+    email: 'floor-incharge-brahmaputra1@saratchandra.co.in',
+    name: 'Floor Incharge - Brahmaputra 1',
     contact: '+91-9876543226',
-    role_id: 'warden-role',
-    specialization: 'Bhramaputra 1 Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Brahmaputra 1 Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -395,20 +395,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-brahmaputra2',
-    email: 'warden7@hostel.edu',
-    name: 'Dr. Kavita Nair',
+    id: 'floor-incharge-brahmaputra2',
+    email: 'floor-incharge-brahmaputra2@saratchandra.co.in',
+    name: 'Floor Incharge - Brahmaputra 2',
     contact: '+91-9876543227',
-    role_id: 'warden-role',
-    specialization: 'Bhramaputra 2 Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Brahmaputra 2 Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -421,20 +421,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-narmada',
-    email: 'warden8@hostel.edu',
-    name: 'Prof. Arjun Gupta',
+    id: 'floor-incharge-narmada',
+    email: 'floor-incharge-narmada@saratchandra.co.in',
+    name: 'Floor Incharge - Narmada',
     contact: '+91-9876543228',
-    role_id: 'warden-role',
-    specialization: 'Narmada Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Narmada Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -447,20 +447,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-saraswathi',
-    email: 'warden9@hostel.edu',
-    name: 'Dr. Lakshmi Iyer',
+    id: 'floor-incharge-saraswathi',
+    email: 'floor-incharge-saraswathi@saratchandra.co.in',
+    name: 'Floor Incharge - Saraswathi',
     contact: '+91-9876543229',
-    role_id: 'warden-role',
-    specialization: 'Saraswathi Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Saraswathi Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -473,20 +473,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-civils-girls',
-    email: 'warden10@hostel.edu',
-    name: 'Prof. Deepa Menon',
+    id: 'floor-incharge-civils-girls',
+    email: 'floor-incharge-civils-girls@saratchandra.co.in',
+    name: 'Floor Incharge - Civils Lt Girls',
     contact: '+91-9876543230',
-    role_id: 'warden-role',
-    specialization: 'Civils Lt Girls Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Civils Lt Girls Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -499,20 +499,20 @@ const demoUsers: User[] = [
   },
 
   {
-    id: 'warden-benz-circle',
-    email: 'warden11@hostel.edu',
-    name: 'Dr. Ravi Chandra',
+    id: 'floor-incharge-benz-circle',
+    email: 'floor-incharge-benz-circle@saratchandra.co.in',
+    name: 'Floor Incharge - Benz Circle',
     contact: '+91-9876543231',
-    role_id: 'warden-role',
-    specialization: 'Benz Circle Hostel Warden',
+    role_id: 'floor-incharge-role',
+    specialization: 'Benz Circle Hostel Floor Incharge',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     user_roles: {
-      id: 'warden-role',
-      name: 'hostel_warden',
-      description: 'Hostel warden role',
+      id: 'floor-incharge-role',
+      name: 'floor_incharge',
+      description: 'Floor incharge role',
       permissions: {
         authenticate_complaints: true,
         verify_complaints: true,
@@ -530,12 +530,12 @@ export const getCampusInChargeUsers = (): User[] => {
   return demoUsers.filter(user => user.role_id === 'campus-ic-role')
 }
 
-export const getHostelWardens = (hostelId?: string): User[] => {
-  let wardens = demoUsers.filter(user => user.role_id === 'warden-role')
+export const getFloorIncharges = (hostelId?: string): User[] => {
+  let floorIncharges = demoUsers.filter(user => user.role_id === 'floor-incharge-role')
   if (hostelId) {
-    wardens = wardens.filter(warden => warden.hostel_id === hostelId || warden.hostel_id === null)
+    floorIncharges = floorIncharges.filter(incharge => incharge.hostel_id === hostelId || incharge.hostel_id === null)
   }
-  return wardens
+  return floorIncharges
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -546,63 +546,96 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true)
     
     try {
-      // For demo purposes, use the demo users
-      const demoUser = demoUsers.find(u => u.email === email)
-      
-      // Simplified demo authentication - any demo user with correct password
-      if (demoUser && (
-        (email === 'admin@hostel.edu' && password === 'admin123') ||
-        (email.includes('@hostel.edu') && password === 'demo123')
-      )) {
-        setUser(demoUser)
-        toast.success(`Welcome, ${demoUser.name}!`)
-        return true
+      // Use Supabase Auth for authentication
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (authError) {
+        // If Supabase Auth fails, fall back to temporary demo authentication
+        console.log('Supabase Auth not ready, using temporary demo mode')
+        
+        // Temporary passwords for demo/development
+        const tempPasswords: Record<string, string> = {
+          'admin@saratchandra.co.in': 'SecureAdmin2024!',
+          // All other users use the same temporary password
+          'coord1@saratchandra.co.in': 'TempPass2024!',
+          'coord2@saratchandra.co.in': 'TempPass2024!',
+          'coord3@saratchandra.co.in': 'TempPass2024!',
+          'coord4@saratchandra.co.in': 'TempPass2024!',
+          'coord5@saratchandra.co.in': 'TempPass2024!',
+          'coord6@saratchandra.co.in': 'TempPass2024!',
+          'coord7@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-godavari@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-sarayu@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-ganga1@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-ganga2@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-krishna@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-brahmaputra1@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-brahmaputra2@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-narmada@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-saraswathi@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-civils-girls@saratchandra.co.in': 'TempPass2024!',
+          'floor-incharge-benz-circle@saratchandra.co.in': 'TempPass2024!'
+        }
+
+        if (tempPasswords[email] && tempPasswords[email] === password) {
+          const demoUser = demoUsers.find(u => u.email === email)
+          if (demoUser) {
+            setUser(demoUser)
+            toast.success(`Welcome, ${demoUser.name}!`)
+            return true
+          }
+        }
+        
+        toast.error('Invalid credentials')
+        return false
       }
-      
-      // If not a demo user, try real authentication (for when schema is set up)
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
+
+      // If Supabase Auth succeeds, get user data from app_users table
+      if (authData.user) {
+        const { data: userData, error: userError } = await supabase
+          .from('app_users')
+          .select(`
+            *,
+            user_roles (
+              id,
+              name,
+              description,
+              permissions
+            )
+          `)
           .eq('email', email)
           .eq('is_active', true)
           .single()
 
-        if (error) throw error
-
-        if (data) {
-          // For now, assign a default role based on email pattern
-          let role = 'administrator'
-          if (email.includes('campus')) role = 'campus_in_charge'
-          if (email.includes('warden')) role = 'hostel_warden'
-          
-          const userWithRole: User = {
-            ...data,
-            role_id: role,
-            user_roles: {
-              id: role,
-              name: role,
-              description: `${role} role`,
-              permissions: role === 'administrator' ? {
-                view_all_complaints: true,
-                approve_costs: true,
-                assign_complaints: true,
-                resolve_complaints: true
-              } : {}
-            }
-          }
-          
-          setUser(userWithRole)
-          toast.success(`Welcome, ${data.name}!`)
-          return true
+        if (userError || !userData) {
+          await supabase.auth.signOut()
+          toast.error('User account not found or inactive')
+          return false
         }
-      } catch (dbError) {
-        console.log('Database not ready, using demo mode')
+
+        // Update auth_user_id if not set
+        if (!userData.auth_user_id) {
+          await supabase
+            .from('app_users')
+            .update({ 
+              auth_user_id: authData.user.id,
+              last_login: new Date().toISOString()
+            })
+            .eq('id', userData.id)
+        }
+
+        setUser(userData as User)
+        toast.success(`Welcome, ${userData.name}!`)
+        return true
       }
       
-      toast.error('Invalid credentials')
+      toast.error('Authentication failed')
       return false
     } catch (error: any) {
+      console.error('Login error:', error)
       toast.error('Login failed', {
         description: error.message
       })
@@ -613,6 +646,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = () => {
+    // Sign out from Supabase Auth
+    supabase.auth.signOut()
     setUser(null)
     toast.success('Logged out successfully')
   }

@@ -1,7 +1,7 @@
 import { useAuth } from './AuthProvider'
 import { AdminRoleDashboard } from './AdminRoleDashboard'
 import { CampusInChargeDashboard } from './CampusInChargeDashboard'
-import { HostelWardenDashboard } from './HostelWardenDashboard'
+import { FloorInchargeDashboard } from './FloorInchargeDashboard'
 import { LoginForm } from './LoginForm'
 import { AlertTriangle } from 'lucide-react'
 
@@ -28,8 +28,8 @@ export function RoleBasedDashboard() {
     case 'campus_in_charge':
       return <CampusInChargeDashboard />
     
-    case 'hostel_warden':
-      return <HostelWardenDashboard />
+    case 'floor_incharge':
+      return <FloorInchargeDashboard />
     
     default:
       return (

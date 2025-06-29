@@ -179,9 +179,9 @@ export function useComplaintSubmission() {
 
       // Prepare complaint data with instant IP detection
       const complaintData = {
-        hostel_id: data.hostel_id,
+        hostel_id: data.hostel_id.startsWith('fallback-') ? null : data.hostel_id,
         room_number: validateLength(data.room_text, 50, 'Room number'),
-        category_id: data.category_id,
+        category_id: data.category_id.startsWith('fallback-') ? null : data.category_id,
         student_name: validateLength(data.student_name, 100, 'Student name'),
         student_contact: data.student_contact ? validateLength(data.student_contact, 20, 'Contact') : 'Not provided',
         student_email: data.student_email ? validateLength(data.student_email, 100, 'Email') : null,

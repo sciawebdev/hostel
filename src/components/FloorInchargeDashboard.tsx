@@ -12,13 +12,13 @@ import {
 import { useComplaints } from '../hooks/useComplaints'
 import { useAuth } from './AuthProvider'
 import { ComplaintsList } from './ComplaintsList'
-import { WardenComplaintManagement } from './WardenComplaintManagement'
+import { FloorInchargeComplaintManagement } from './FloorInchargeComplaintManagement'
 import { COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
 import type { Complaint } from '../lib/supabase'
 
 type TabType = 'pending-verification' | 'work-verification' | 'all-complaints'
 
-export function HostelWardenDashboard() {
+export function FloorInchargeDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('pending-verification')
   const [selectedComplaintId, setSelectedComplaintId] = useState<string | null>(null)
   const { user, logout } = useAuth()
@@ -26,7 +26,7 @@ export function HostelWardenDashboard() {
 
   const [selectedHostel, setSelectedHostel] = useState<string>(user?.hostel_id || 'all')
 
-  // Filter complaints for this hostel if warden is assigned to specific hostel
+  // Filter complaints for this hostel if floor incharge is assigned to specific hostel
   const hostelComplaints = useMemo(() => {
     if (!user?.hostel_id) return complaints
     return complaints.filter((c: Complaint) => c.hostel_id === user.hostel_id)
@@ -59,7 +59,7 @@ export function HostelWardenDashboard() {
 
   if (selectedComplaintId) {
     return (
-      <WardenComplaintManagement 
+      <FloorInchargeComplaintManagement 
         complaintId={selectedComplaintId}
         onBack={() => setSelectedComplaintId(null)}
       />
@@ -75,7 +75,7 @@ export function HostelWardenDashboard() {
             <div className="flex items-center space-x-4">
               <Shield className="h-8 w-8 text-white" />
               <div>
-                <h1 className="text-xl font-semibold text-white">Hostel Warden Dashboard</h1>
+                <h1 className="text-xl font-semibold text-white">Floor Incharge Dashboard</h1>
                 <p className="text-sm text-blue-100">
                   {user?.hostels?.name ? `${user.hostels.name} - ${user.hostels.location}` : 'All Hostels'}
                 </p>
@@ -85,7 +85,7 @@ export function HostelWardenDashboard() {
             <div className="flex items-center space-x-4">
               <div className="text-right">
                 <p className="text-sm font-medium text-white">{user?.name}</p>
-                <p className="text-xs text-blue-100">Hostel Warden</p>
+                <p className="text-xs text-blue-100">Floor Incharge</p>
               </div>
               <button
                 onClick={logout}
@@ -205,7 +205,7 @@ export function HostelWardenDashboard() {
 
         {/* Information Panel */}
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-blue-900 mb-2">Your Role as Hostel Warden</h3>
+          <h3 className="text-lg font-medium text-blue-900 mb-2">Your Role as Floor Incharge</h3>
           <div className="text-sm text-blue-800 space-y-2">
             <p>• <strong>Complaint Verification:</strong> Authenticate whether complaints are genuine when they arrive</p>
             <p>• <strong>Work Verification:</strong> Verify that work has been completed satisfactorily after campus in-charge marks it as done</p>
