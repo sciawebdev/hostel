@@ -67,13 +67,13 @@ export function FloorInchargeComplaintManagement({ complaintId, onBack }: FloorI
       }
 
       const { error: authError } = await supabase
-        .from('warden_authentications')
+        .from('floor_incharge_authentications')
         .insert([{
           complaint_id: complaintId,
           floor_incharge_id: user.id,
-          is_verified: verified,
-          verification_notes: JSON.stringify(verificationData),
-          verified_at: new Date().toISOString()
+          is_authenticated: verified,
+          authentication_notes: JSON.stringify(verificationData),
+          authenticated_at: new Date().toISOString()
         }])
 
       if (authError) throw authError
@@ -192,7 +192,7 @@ export function FloorInchargeComplaintManagement({ complaintId, onBack }: FloorI
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-800">
-                    <strong>Automated Workflow:</strong> Once you verify this complaint, it will automatically be assigned to the campus coordinator for cost estimation. If you reject it, the complaint will be marked as rejected.
+                    <strong>New Workflow:</strong> Once you verify this complaint, it will be sent to the admin for manual assignment to a campus coordinator. If you reject it, the complaint will be marked as rejected.
                   </p>
                 </div>
 
@@ -217,7 +217,7 @@ export function FloorInchargeComplaintManagement({ complaintId, onBack }: FloorI
                     className="flex items-center px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    {floorInchargeVerificationMutation.isPending ? 'Verifying...' : 'Verify & Auto-Assign for Cost Estimation'}
+                    {floorInchargeVerificationMutation.isPending ? 'Verifying...' : 'Verify Complaint'}
                   </button>
                   <button
                     onClick={() => handleComplaintVerification(false)}

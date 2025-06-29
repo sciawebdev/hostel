@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { DollarSign, CheckCircle, X, Clock, FileText, User, MapPin, Building, AlertTriangle, Star, Phone, Mail, Calendar, Shield, Wrench } from 'lucide-react'
-import { useCostApproval, useWardenAuthentications, useComplaintActivities } from '../hooks/useRoleBasedWorkflow'
+import { useCostApproval, useFloorInchargeAuthentications, useComplaintActivities } from '../hooks/useRoleBasedWorkflow'
 import { useAuth } from './AuthProvider'
 import type { CostApproval } from '../types/auth'
 
@@ -33,14 +33,14 @@ interface ComplaintContextProps {
 }
 
 function ComplaintContext({ approval }: ComplaintContextProps) {
-  const { data: wardenAuths = [] } = useWardenAuthentications(approval.complaint_id)
+  const { data: floorInchargeAuths = [] } = useFloorInchargeAuthentications(approval.complaint_id)
   const { data: activities = [] } = useComplaintActivities(approval.complaint_id)
   
   const complaint = approval.complaints
   if (!complaint) return null
 
   const urgencyBadge = getUrgencyBadge(complaint.urgency_level || 1)
-  const latestWardenAuth = wardenAuths[0]
+  const latestFloorInchargeAuth = floorInchargeAuths[0]
   const recentActivities = activities.slice(0, 5)
 
   return (
@@ -122,33 +122,33 @@ function ComplaintContext({ approval }: ComplaintContextProps) {
         </div>
       </div>
 
-      {/* Warden Verification */}
-      {latestWardenAuth && (
+      {/* Floor Incharge Verification */}
+      {latestFloorInchargeAuth && (
         <div className="bg-white rounded-lg p-4 border border-gray-200">
           <h5 className="font-medium text-gray-900 mb-3 flex items-center">
             <Shield className="h-5 w-5 mr-2 text-purple-600" />
-            Warden Verification
+            Floor Incharge Verification
           </h5>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
             <div>
               <p className="text-sm font-medium text-gray-600">Verified By</p>
-              <p className="text-sm text-gray-900">{latestWardenAuth.warden?.name || 'N/A'}</p>
+              <p className="text-sm text-gray-900">{latestFloorInchargeAuth.floor_incharge?.name || 'N/A'}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">Verification Status</p>
               <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                latestWardenAuth.is_authenticated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                latestFloorInchargeAuth.is_authenticated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
               }`}>
-                {latestWardenAuth.is_authenticated ? 'Verified' : 'Rejected'}
+                {latestFloorInchargeAuth.is_authenticated ? 'Verified' : 'Rejected'}
               </span>
             </div>
           </div>
           
-          {latestWardenAuth.authentication_notes && (
+          {latestFloorInchargeAuth.authentication_notes && (
             <div>
               <p className="text-sm font-medium text-gray-600 mb-1">Verification Notes</p>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{latestWardenAuth.authentication_notes}</p>
+              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{latestFloorInchargeAuth.authentication_notes}</p>
             </div>
           )}
         </div>

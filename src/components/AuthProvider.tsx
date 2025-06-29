@@ -242,8 +242,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-godavari',
     email: 'floor-incharge-godavari@saratchandra.co.in',
     name: 'Floor Incharge - Godavari',
-    contact: '+91-9876543221',
+    contact: '+91-9876543220',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-godavari',
     specialization: 'Godavari Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -268,8 +269,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-sarayu',
     email: 'floor-incharge-sarayu@saratchandra.co.in',
     name: 'Floor Incharge - Sarayu',
-    contact: '+91-9876543222',
+    contact: '+91-9876543221',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-sarayu',
     specialization: 'Sarayu Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -294,8 +296,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-ganga1',
     email: 'floor-incharge-ganga1@saratchandra.co.in',
     name: 'Floor Incharge - Ganga 1',
-    contact: '+91-9876543223',
+    contact: '+91-9876543222',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-ganga1',
     specialization: 'Ganga 1 Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -320,8 +323,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-ganga2',
     email: 'floor-incharge-ganga2@saratchandra.co.in',
     name: 'Floor Incharge - Ganga 2',
-    contact: '+91-9876543224',
+    contact: '+91-9876543223',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-ganga2',
     specialization: 'Ganga 2 Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -346,8 +350,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-krishna',
     email: 'floor-incharge-krishna@saratchandra.co.in',
     name: 'Floor Incharge - Krishna',
-    contact: '+91-9876543225',
+    contact: '+91-9876543224',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-krishna',
     specialization: 'Krishna Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -372,8 +377,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-brahmaputra1',
     email: 'floor-incharge-brahmaputra1@saratchandra.co.in',
     name: 'Floor Incharge - Brahmaputra 1',
-    contact: '+91-9876543226',
+    contact: '+91-9876543225',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-bhramaputra1',
     specialization: 'Brahmaputra 1 Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -398,8 +404,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-brahmaputra2',
     email: 'floor-incharge-brahmaputra2@saratchandra.co.in',
     name: 'Floor Incharge - Brahmaputra 2',
-    contact: '+91-9876543227',
+    contact: '+91-9876543226',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-bhramaputra2',
     specialization: 'Brahmaputra 2 Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -424,8 +431,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-narmada',
     email: 'floor-incharge-narmada@saratchandra.co.in',
     name: 'Floor Incharge - Narmada',
-    contact: '+91-9876543228',
+    contact: '+91-9876543227',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-narmada',
     specialization: 'Narmada Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -450,8 +458,9 @@ const demoUsers: User[] = [
     id: 'floor-incharge-saraswathi',
     email: 'floor-incharge-saraswathi@saratchandra.co.in',
     name: 'Floor Incharge - Saraswathi',
-    contact: '+91-9876543229',
+    contact: '+91-9876543228',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-saraswathi',
     specialization: 'Saraswathi Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -478,6 +487,7 @@ const demoUsers: User[] = [
     name: 'Floor Incharge - Civils Lt Girls',
     contact: '+91-9876543230',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-civils-lt-girls',
     specialization: 'Civils Lt Girls Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -504,6 +514,7 @@ const demoUsers: User[] = [
     name: 'Floor Incharge - Benz Circle',
     contact: '+91-9876543231',
     role_id: 'floor-incharge-role',
+    hostel_id: 'hostel-benz-circle',
     specialization: 'Benz Circle Hostel Floor Incharge',
     is_active: true,
     last_login: null,
@@ -646,10 +657,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = () => {
-    // Sign out from Supabase Auth
-    supabase.auth.signOut()
-    setUser(null)
-    toast.success('Logged out successfully')
+    console.log('Logout function called')
+    try {
+      // Sign out from Supabase Auth
+      supabase.auth.signOut()
+      setUser(null)
+      toast.success('Logged out successfully')
+      console.log('Logout successful')
+    } catch (error) {
+      console.error('Logout error:', error)
+      toast.error('Logout failed')
+    }
   }
 
   const hasPermission = (permission: string): boolean => {

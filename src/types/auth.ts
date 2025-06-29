@@ -105,25 +105,15 @@ export type CostApproval = {
   }
 }
 
-export type WardenAuthentication = {
+export type FloorInchargeAuthentication = {
   id: string
   complaint_id: string
-  warden_id: string
-  authentication_type: 'COMPLAINT_VERIFICATION' | 'WORK_COMPLETION'
-  
-  // Authentication details
+  floor_incharge_id: string
   is_authenticated: boolean
   authentication_notes: string | null
-  authentication_status: 'PENDING' | 'VERIFIED' | 'REJECTED'
-  
-  // Evidence/photos if any
-  evidence_urls: string[] | null
-  
+  authenticated_at: string | null
   created_at: string
-  updated_at: string
-  
-  // Joined relations
-  warden?: User
+  floor_incharge?: User
 }
 
 export type ComplaintAssignment = {
@@ -175,15 +165,15 @@ export type WorkProgressUpdate = {
   updated_by_user?: User
 }
 
-export type ComplaintStage = 
+export type ComplaintWorkflowStage = 
   | 'COMPLAINT_SUBMITTED'
-  | 'WARDEN_VERIFICATION'
+  | 'FLOOR_INCHARGE_VERIFICATION'
   | 'ASSIGNED_TO_CAMPUS_IC'
   | 'COST_ESTIMATION'
   | 'COST_APPROVAL'
   | 'WORK_IN_PROGRESS'
   | 'WORK_COMPLETED'
-  | 'WARDEN_WORK_VERIFICATION'
+  | 'FLOOR_INCHARGE_WORK_VERIFICATION'
   | 'FINAL_APPROVAL'
   | 'RESOLVED'
 
@@ -226,13 +216,13 @@ export type EnhancedComplaint = {
   student_feedback: string | null
   
   // New workflow fields
-  warden_verification_status: 'PENDING' | 'VERIFIED' | 'REJECTED'
-  warden_verified_by: string | null
-  warden_verified_at: string | null
+  floor_incharge_verification_status: 'PENDING' | 'VERIFIED' | 'REJECTED'
+  floor_incharge_verified_by: string | null
+  floor_incharge_verified_at: string | null
   work_completion_verified: boolean
   work_verified_by: string | null
   work_verified_at: string | null
-  current_stage: ComplaintStage
+  current_stage: ComplaintWorkflowStage
   
   // Joined relations
   hostels?: {
@@ -249,7 +239,7 @@ export type EnhancedComplaint = {
     priority_level?: number | null
   }
   cost_approvals?: CostApproval[]
-  warden_authentications?: WardenAuthentication[]
+  floor_incharge_authentications?: FloorInchargeAuthentication[]
   complaint_assignments?: ComplaintAssignment[]
   complaint_activities?: ComplaintActivity[]
   work_progress_updates?: WorkProgressUpdate[]

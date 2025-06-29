@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
+import { supabase, COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
 import { queryKeys } from '../lib/react-query'
 import { toast } from 'sonner'
 import type { Complaint } from '../lib/supabase'
@@ -171,7 +171,7 @@ export function useAssignComplaint() {
       const updateData: any = {
         assigned_to: staffName,
         assigned_at: new Date().toISOString(),
-        status: 'IN_PROGRESS',
+        status: COMPLAINT_WORKFLOW_STATUS.ASSIGNED_TO_CAMPUS_IC,
         updated_at: new Date().toISOString(),
       }
 

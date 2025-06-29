@@ -67,9 +67,9 @@ export function FloorInchargeDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 pt-28">
       {/* Header */}
-      <div className="bg-blue-600 shadow-sm">
+      <div className="bg-blue-600 shadow-sm relative z-[60]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -208,9 +208,9 @@ export function FloorInchargeDashboard() {
           <h3 className="text-lg font-medium text-blue-900 mb-2">Your Role as Floor Incharge</h3>
           <div className="text-sm text-blue-800 space-y-2">
             <p>• <strong>Complaint Verification:</strong> Authenticate whether complaints are genuine when they arrive</p>
-            <p>• <strong>Work Verification:</strong> Verify that work has been completed satisfactorily after campus in-charge marks it as done</p>
-            <p>• <strong>Provide Opinions:</strong> Your verification helps the administrator make final decisions on complaint resolution</p>
-            <p>• <strong>Note:</strong> You provide authentication and opinions but do not directly change complaint status</p>
+            <p>• <strong>Work Verification:</strong> Verify that work has been completed satisfactorily after campus coordinator marks it as done</p>
+            <p>• <strong>Admin Assignment:</strong> After your verification, complaints are sent to admin for manual assignment to appropriate coordinators</p>
+            <p>• <strong>Final Resolution:</strong> Your work verification helps administrators complete the complaint resolution process</p>
           </div>
         </div>
       </div>

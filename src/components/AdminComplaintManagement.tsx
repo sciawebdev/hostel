@@ -16,10 +16,12 @@ import { useComplaint } from '../hooks/useComplaints'
 import { useAuth } from './AuthProvider'
 import { 
   useCostApprovals,
-  useWardenAuthentications,
+  useFloorInchargeAuthentications,
   useCostApproval,
-  useFinalResolution
+  useFinalResolution,
+  useAssignComplaintToUser
 } from '../hooks/useRoleBasedWorkflow'
+import { getCampusInChargeUsers } from './AuthProvider'
 import { supabase } from '../lib/supabase'
 import { toast } from 'sonner'
 import { ComplaintDetails } from './ComplaintDetails'
@@ -31,7 +33,11 @@ interface AdminComplaintManagementProps {
 }
 
 export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaintManagementProps) {
-  const [activeTab, setActiveTab] = useState<'details' | 'cost-approval' | 'final-resolution' | 'reopen'>('details')
+  const [activeTab, setActiveTab] = useState<'details' | 'assignment' | 'cost-approval' | 'final-resolution' | 'reopen'>('details')
+  
+  // Assignment state
+  const [selectedCoordinator, setSelectedCoordinator] = useState('')
+  const [assignmentReason, setAssignmentReason] = useState('')
   
   // Cost approval state
   const [approvalNotes, setApprovalNotes] = useState('')
@@ -49,10 +55,43 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
   const { user } = useAuth()
   const { data: complaint, isLoading } = useComplaint(complaintId)
   const { data: costApprovals = [] } = useCostApprovals(complaintId)
-  const { data: wardenAuthentications = [] } = useWardenAuthentications(complaintId)
+  const { data: floorInchargeAuthentications = [] } = useFloorInchargeAuthentications(complaintId)
   
   const costApprovalMutation = useCostApproval()
   const finalResolutionMutation = useFinalResolution()
+  const assignmentMutation = useAssignComplaintToUser()
+  
+  const campusCoordinators = getCampusInChargeUsers()
+
+  const handleAssignment = async () => {
+    if (!user || !selectedCoordinator) return
+
+    console.log('=== ADMIN ASSIGNMENT ATTEMPT ===')
+    console.log('Current user object:', JSON.stringify(user, null, 2))
+    console.log('user.id:', user.id)
+    console.log('user.id type:', typeof user.id)
+    console.log('selectedCoordinator:', selectedCoordinator)
+    console.log('assignmentReason:', assignmentReason)
+
+    try {
+      console.log('🚀 Starting assignment mutation...')
+      await assignmentMutation.mutateAsync({
+        complaint_id: complaintId,
+        staff_member_id: selectedCoordinator,
+        assigned_by: user.id,
+        assignment_reason: assignmentReason || undefined
+      })
+      
+      console.log('✅ Assignment completed successfully')
+      setSelectedCoordinator('')
+      setAssignmentReason('')
+      setActiveTab('details')
+    } catch (error) {
+      console.error('❌ Assignment failed:', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
+      // Error handled by mutation
+    }
+  }
 
   const handleCostApproval = async (approved: boolean) => {
     if (!user) return
@@ -144,6 +183,8 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
     switch (stage) {
       case COMPLAINT_WORKFLOW_STATUS.VERIFICATION_PENDING:
         return <UserCheck className="h-5 w-5 text-orange-500" />
+      case COMPLAINT_WORKFLOW_STATUS.PENDING_ADMIN_ASSIGNMENT:
+        return <Settings className="h-5 w-5 text-purple-500" />
       case COMPLAINT_WORKFLOW_STATUS.ASSIGNED_TO_CAMPUS_IC:
         return <UserCheck className="h-5 w-5 text-blue-500" />
       case COMPLAINT_WORKFLOW_STATUS.PROPOSAL_SUBMITTED:
@@ -165,6 +206,8 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
     switch (stage) {
       case COMPLAINT_WORKFLOW_STATUS.VERIFICATION_PENDING:
         return 'bg-orange-100 text-orange-800'
+      case COMPLAINT_WORKFLOW_STATUS.PENDING_ADMIN_ASSIGNMENT:
+        return 'bg-purple-100 text-purple-800'
       case COMPLAINT_WORKFLOW_STATUS.ASSIGNED_TO_CAMPUS_IC:
         return 'bg-blue-100 text-blue-800'
       case COMPLAINT_WORKFLOW_STATUS.PROPOSAL_SUBMITTED:
@@ -220,6 +263,7 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
     )
   }
 
+  const canAssign = complaint.status !== COMPLAINT_WORKFLOW_STATUS.RESOLVED && complaint.status !== COMPLAINT_WORKFLOW_STATUS.CLOSED
   const canApproveCost = complaint.status === COMPLAINT_WORKFLOW_STATUS.PROPOSAL_SUBMITTED
   const canResolve = complaint.status === COMPLAINT_WORKFLOW_STATUS.WORK_VERIFIED
   const canReopen = complaint.status === COMPLAINT_WORKFLOW_STATUS.RESOLVED
@@ -258,6 +302,7 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
               <nav className="-mb-px flex space-x-8">
                 {[
                   { id: 'details', label: 'Complaint Details' },
+                  { id: 'assignment', label: 'Assign/Reassign Coordinator', disabled: !canAssign },
                   { id: 'cost-approval', label: 'Cost Approval', disabled: !canApproveCost },
                   { id: 'final-resolution', label: 'Final Resolution', disabled: !canResolve },
                   { id: 'reopen', label: 'Reopen Complaint', disabled: !canReopen }
@@ -284,6 +329,178 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
           <div className="p-6">
             {activeTab === 'details' && (
               <ComplaintDetails complaintId={complaintId} onBack={() => {}} />
+            )}
+
+            {activeTab === 'assignment' && (
+              <div className="space-y-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Settings className="h-6 w-6 text-purple-500" />
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {complaint.assigned_to ? 'Reassign to Campus Coordinator' : 'Assign to Campus Coordinator'}
+                  </h3>
+                </div>
+
+                {/* Current Assignment Info */}
+                {complaint.assigned_to && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <h4 className="text-sm font-medium text-blue-900 mb-2">Current Assignment</h4>
+                    <p className="text-sm text-blue-800">
+                      Currently assigned to: <strong>{(() => {
+                        const currentCoordinator = campusCoordinators.find(c => c.id === complaint.assigned_to)
+                        return currentCoordinator ? `${currentCoordinator.name} (${currentCoordinator.email})` : complaint.assigned_to
+                      })()}</strong>
+                    </p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      Assigned on: {complaint.assigned_at ? new Date(complaint.assigned_at).toLocaleString() : 'Unknown'}
+                    </p>
+                  </div>
+                )}
+
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <p className="text-sm text-purple-800">
+                    <strong>{complaint.assigned_to ? 'Reassignment' : 'Assignment'} Process:</strong> Select a campus coordinator based on their expertise and availability. You can {complaint.assigned_to ? 'reassign to any coordinator' : 'choose any coordinator regardless of hostel assignment'} for flexibility.
+                  </p>
+                </div>
+
+                {/* Complaint Summary */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                    📋 Complaint Summary
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">🏠 Hostel:</span>
+                        <p className="text-sm text-gray-900">{complaint.hostels?.name || 'Not specified'}</p>
+                      </div>
+                      
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">🔧 Category:</span>
+                        <p className="text-sm text-gray-900">{complaint.complaint_categories?.name || 'General'}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">📊 Priority:</span>
+                        <p className="text-sm text-gray-900">Level {complaint.complaint_categories?.priority_level || complaint.priority || 'Medium'}</p>
+                      </div>
+                      
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">📅 Verified:</span>
+                        <p className="text-sm text-gray-900">{complaint.created_at ? new Date(complaint.created_at).toLocaleDateString() : 'Recently'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <span className="text-sm font-medium text-gray-700">📝 Description:</span>
+                    <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                      <p className="text-sm text-gray-800">{complaint.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Campus Coordinator Selection */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                    👥 Available Campus Coordinators
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select Campus Coordinator *
+                      </label>
+                      <select
+                        value={selectedCoordinator}
+                        onChange={(e) => setSelectedCoordinator(e.target.value)}
+                        className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                        required
+                      >
+                        <option value="">Choose a coordinator...</option>
+                        {campusCoordinators.map((coordinator) => (
+                          <option key={coordinator.id} value={coordinator.id}>
+                            {coordinator.name} - {coordinator.contact}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Selected Coordinator Details
+                      </label>
+                      {selectedCoordinator ? (
+                        <div className="p-3 bg-purple-50 rounded-md">
+                          {(() => {
+                            const coordinator = campusCoordinators.find(c => c.id === selectedCoordinator)
+                            return coordinator ? (
+                              <div className="text-sm">
+                                <p className="font-medium text-purple-900">{coordinator.name}</p>
+                                <p className="text-purple-700">📞 {coordinator.contact}</p>
+                                <p className="text-purple-700">📧 {coordinator.email}</p>
+                              </div>
+                            ) : null
+                          })()}
+                        </div>
+                      ) : (
+                        <div className="p-3 bg-gray-50 rounded-md">
+                          <p className="text-sm text-gray-500">Select a coordinator to see details</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Assignment Reason */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    💬 Assignment Reason & Instructions (Optional)
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={assignmentReason}
+                    onChange={(e) => setAssignmentReason(e.target.value)}
+                    className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="Specify why you selected this coordinator and any special instructions:&#10;• Expertise in this type of work&#10;• Current availability&#10;• Specific knowledge required&#10;• Any priority considerations"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    This information will be shared with the assigned coordinator to provide context for the assignment.
+                  </p>
+                </div>
+
+                {/* Assignment Actions */}
+                <div className="flex space-x-4">
+                  <button
+                    onClick={handleAssignment}
+                    disabled={assignmentMutation.isPending || !selectedCoordinator}
+                    className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    <UserCheck className="h-4 w-4 mr-2" />
+                    {assignmentMutation.isPending 
+                      ? (complaint.assigned_to ? 'Reassigning...' : 'Assigning...') 
+                      : (complaint.assigned_to ? '🔄 Reassign to Coordinator' : '✅ Assign to Coordinator')
+                    }
+                  </button>
+                  
+                  {!selectedCoordinator && (
+                    <div className="flex items-center px-4 py-3 bg-gray-100 text-gray-500 rounded-md text-sm">
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Please select a coordinator first
+                    </div>
+                  )}
+                </div>
+
+                {selectedCoordinator && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-sm text-green-800">
+                      💡 Once {complaint.assigned_to ? 'reassigned' : 'assigned'}, the coordinator will receive the complaint for cost estimation and will proceed with the work after your approval.
+                    </p>
+                  </div>
+                )}
+              </div>
             )}
 
             {activeTab === 'cost-approval' && (
@@ -471,28 +688,28 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
                   </div>
                 )}
 
-                {/* Display Warden Verification Details */}
-                {wardenAuthentications.length > 0 && (
+                {/* Display Floor Incharge Verification Details */}
+                {floorInchargeAuthentications.length > 0 && (
                   <div className="bg-blue-50 p-4 rounded-lg space-y-3">
-                    <h4 className="font-medium text-gray-900">🏠 Warden Quality Verification:</h4>
-                    {wardenAuthentications.map((auth: any, index) => {
+                    <h4 className="font-medium text-gray-900">🏠 Floor Incharge Quality Verification:</h4>
+                    {floorInchargeAuthentications.map((auth: any, index: number) => {
                       let verificationData = null;
                       try {
-                        verificationData = JSON.parse(auth.verification_notes || '{}');
+                        verificationData = JSON.parse(auth.authentication_notes || '{}');
                       } catch (e) {
-                        verificationData = { additional_comments: auth.verification_notes };
+                        verificationData = { additional_comments: auth.authentication_notes };
                       }
                       
                       return (
                         <div key={auth.id} className="bg-white border border-blue-200 rounded-md p-3">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-medium text-blue-800">
-                              Verification {index + 1} - {auth.verified_at ? new Date(auth.verified_at).toLocaleString() : 'N/A'}
+                              Verification {index + 1} - {auth.authenticated_at ? new Date(auth.authenticated_at).toLocaleString() : 'N/A'}
                             </span>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              auth.is_verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              auth.is_authenticated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                             }`}>
-                              {auth.is_verified ? '✅ Verified' : '❌ Rejected'}
+                              {auth.is_authenticated ? '✅ Verified' : '❌ Rejected'}
                             </span>
                           </div>
                           
@@ -509,7 +726,7 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
                             )}
                             {verificationData.additional_comments && (
                               <div>
-                                <span className="font-medium text-gray-700">Warden Comments:</span>
+                                <span className="font-medium text-gray-700">Floor Incharge Comments:</span>
                                 <p className="text-gray-600 ml-2 mt-1 italic">"{verificationData.additional_comments}"</p>
                               </div>
                             )}

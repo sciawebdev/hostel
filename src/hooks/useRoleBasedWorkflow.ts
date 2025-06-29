@@ -3,7 +3,7 @@ import { supabase, COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
 import { toast } from 'sonner'
 import type { 
   CostApproval, 
-  WardenAuthentication, 
+  FloorInchargeAuthentication, 
   ComplaintAssignment, 
   WorkProgressUpdate,
   ComplaintActivity 
@@ -34,9 +34,9 @@ async function autoTransitionWorkflow(complaintId: string, currentStage: Complai
 
     switch (currentStage) {
       case COMPLAINT_WORKFLOW_STATUS.VERIFIED:
-        nextStage = COMPLAINT_WORKFLOW_STATUS.ASSIGNED_TO_CAMPUS_IC
-        activityDescription = 'Auto-assigned to Campus In-Charge after warden verification.'
-        // Here you would also add logic to actually assign it to a user
+        nextStage = COMPLAINT_WORKFLOW_STATUS.PENDING_ADMIN_ASSIGNMENT
+        activityDescription = 'Verified by floor incharge. Awaiting admin assignment to campus coordinator.'
+        // No auto-assignment - admin will manually assign
         break
 
       case COMPLAINT_WORKFLOW_STATUS.PROPOSAL_SUBMITTED:
@@ -242,16 +242,16 @@ export function useApproveCost() {
   })
 }
 
-// Warden Authentication Hooks
-export function useWardenAuthentications(complaintId?: string) {
+// Floor Incharge Authentication Hooks
+export function useFloorInchargeAuthentications(complaintId?: string) {
   return useQuery({
-    queryKey: ['warden-authentications', complaintId],
-    queryFn: async (): Promise<WardenAuthentication[]> => {
+    queryKey: ['floor-incharge-authentications', complaintId],
+    queryFn: async (): Promise<FloorInchargeAuthentication[]> => {
       let query = supabase
-        .from('warden_authentications')
+        .from('floor_incharge_authentications')
         .select(`
           *,
-          warden:app_users(id, name, email)
+          floor_incharge:app_users(id, name, email)
         `)
         .order('created_at', { ascending: false })
 
@@ -271,25 +271,25 @@ export function useWardenAuthentications(complaintId?: string) {
   })
 }
 
-export function useCreateWardenAuthentication() {
+export function useCreateFloorInchargeAuthentication() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (authData: {
       complaint_id: string
-      warden_id: string
+      floor_incharge_id: string
       authentication_type: 'COMPLAINT_VERIFICATION' | 'WORK_COMPLETION'
       is_authenticated: boolean
       authentication_notes?: string
       evidence_urls?: string[]
     }) => {
       const { data, error } = await supabase
-        .from('warden_authentications')
+        .from('floor_incharge_authentications')
         .insert([{
           complaint_id: authData.complaint_id,
-          warden_id: authData.warden_id,
-          is_verified: authData.is_authenticated,
-          verification_notes: authData.authentication_notes || ''
+          floor_incharge_id: authData.floor_incharge_id,
+          is_authenticated: authData.is_authenticated,
+          authentication_notes: authData.authentication_notes || ''
         }])
         .select()
         .single()
@@ -348,8 +348,8 @@ export function useCreateWardenAuthentication() {
                 .insert([{
                   complaint_id: authData.complaint_id,
                   staff_member_id: assignedCoordinator,
-                  assigned_by: authData.warden_id,
-                  assignment_reason: `Auto-assigned to campus coordinator after warden verification for ${hostelData.name}`,
+                  assigned_by: authData.floor_incharge_id,
+                  assignment_reason: `Auto-assigned to campus coordinator after floor incharge verification for ${hostelData.name}`,
                   is_current: true
                 }])
             }
@@ -379,14 +379,14 @@ export function useCreateWardenAuthentication() {
           complaint_id: authData.complaint_id,
           activity_type: authData.authentication_type,
           description: `${authData.authentication_type.replace('_', ' ').toLowerCase()}: ${authData.is_authenticated ? 'Verified' : 'Rejected'}`,
-          performed_by: authData.warden_id,
+          performed_by: authData.floor_incharge_id,
         }
       ])
 
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['warden-authentications'] })
+      queryClient.invalidateQueries({ queryKey: ['floor-incharge-authentications'] })
       queryClient.invalidateQueries({ queryKey: ['complaints'] })
       toast.success('Authentication submitted successfully')
     },
@@ -438,54 +438,162 @@ export function useAssignComplaintToUser() {
       assigned_by: string
       assignment_reason?: string
     }) => {
-      // Mark previous assignments as not current
-      await supabase
-        .from('complaint_assignments')
-        .update({ is_current: false })
-        .eq('complaint_id', assignmentData.complaint_id)
+      console.log('=== ASSIGNMENT DEBUG START ===')
+      console.log('Raw assignment data:', JSON.stringify(assignmentData, null, 2))
+      
+      // Validate assigned_by
+      if (!assignmentData.assigned_by || assignmentData.assigned_by.trim() === '') {
+        console.error('❌ assigned_by is null, undefined, or empty:', assignmentData.assigned_by)
+        throw new Error('Authentication error: User ID is missing. Please logout and login again.')
+      }
 
+      // Clean the assigned_by value
+      const cleanAssignedBy = assignmentData.assigned_by.trim()
+      console.log('✓ Cleaned assigned_by value:', cleanAssignedBy)
+
+      // Double-check: Verify that the assigned_by user exists in the database
+      console.log('🔍 Checking if user exists in database...')
+      const { data: userExists, error: userCheckError } = await supabase
+        .from('app_users')
+        .select('id, email, name')
+        .eq('id', cleanAssignedBy)
+        .single()
+
+      if (userCheckError) {
+        console.error('❌ Database check error:', userCheckError)
+        console.error('Error details:', userCheckError.details, userCheckError.hint, userCheckError.code)
+        
+        // If user doesn't exist and it's 'admin-1', this might be a sync issue
+        if (cleanAssignedBy === 'admin-1') {
+          console.log('🔄 Admin user not found, this might be a sync issue. Using fallback admin ID.')
+          // Let's try with a known good admin ID or create one
+          const { data: adminCheck } = await supabase
+            .from('app_users')
+            .select('id')
+            .ilike('email', '%admin%')
+            .limit(1)
+            .single()
+          
+          if (!adminCheck) {
+            throw new Error('Critical error: No admin user found in database. Please contact system administrator.')
+          }
+        } else {
+          throw new Error(`User authentication error: User '${cleanAssignedBy}' not found in system`)
+        }
+      }
+
+      if (!userExists) {
+        console.error('❌ User does not exist in database:', cleanAssignedBy)
+        throw new Error(`User authentication error: User '${cleanAssignedBy}' not found in system`)
+      }
+
+      console.log('✓ User validation passed:', userExists)
+
+      // Check existing assignments
+      console.log('🔍 Checking for existing assignments...')
+      const { data: previousAssignments } = await supabase
+        .from('complaint_assignments')
+        .select('id')
+        .eq('complaint_id', assignmentData.complaint_id)
+        .eq('is_current', true)
+
+      const wasReassignment = previousAssignments && previousAssignments.length > 0
+      console.log(`✓ Assignment type: ${wasReassignment ? 'REASSIGNMENT' : 'NEW ASSIGNMENT'}`)
+
+      // Mark previous assignments as not current
+      if (wasReassignment) {
+        console.log('🔄 Marking previous assignments as not current...')
+        const { error: updateError } = await supabase
+          .from('complaint_assignments')
+          .update({ is_current: false })
+          .eq('complaint_id', assignmentData.complaint_id)
+        
+        if (updateError) {
+          console.error('❌ Error updating previous assignments:', updateError)
+          throw new Error('Failed to update previous assignments')
+        }
+      }
+
+      // Prepare insertion data
+      const insertData = {
+        complaint_id: assignmentData.complaint_id,
+        staff_member_id: assignmentData.staff_member_id,
+        assigned_by: cleanAssignedBy,
+        assignment_reason: assignmentData.assignment_reason,
+        is_current: true
+      }
+      
+      console.log('📝 About to insert assignment with data:', JSON.stringify(insertData, null, 2))
+
+      // Insert new assignment
       const { data, error } = await supabase
         .from('complaint_assignments')
-        .insert([{
-          complaint_id: assignmentData.complaint_id,
-          staff_member_id: assignmentData.staff_member_id,
-          assigned_by: assignmentData.assigned_by,
-          assignment_reason: assignmentData.assignment_reason,
-          is_current: true
-        }])
+        .insert([insertData])
         .select()
         .single()
 
       if (error) {
-        throw new Error(error.message)
+        console.error('❌ Assignment insert error:', error)
+        console.error('Error details:', error.details)
+        console.error('Error hint:', error.hint)
+        console.error('Error code:', error.code)
+        console.error('Error message:', error.message)
+        
+        // Provide more specific error message
+        if (error.message.includes('complaint_assignments_assigned_by_fkey')) {
+          throw new Error(`Database constraint error: User ID '${cleanAssignedBy}' is not valid. Please logout and login again, or contact administrator.`)
+        }
+        
+        throw new Error(`Assignment failed: ${error.message}`)
       }
 
+      console.log('✓ Assignment created successfully:', data)
+
       // Update complaint status
-      await supabase
+      console.log('🔄 Updating complaint status...')
+      const { error: complaintUpdateError } = await supabase
         .from('complaints')
         .update({ 
-          status: 'ASSIGNED',
+          status: COMPLAINT_WORKFLOW_STATUS.ASSIGNED_TO_CAMPUS_IC,
           assigned_to: assignmentData.staff_member_id,
           assigned_at: new Date().toISOString()
         })
         .eq('id', assignmentData.complaint_id)
 
+      if (complaintUpdateError) {
+        console.error('❌ Complaint update error:', complaintUpdateError)
+        // This is not critical, assignment is already created
+      } else {
+        console.log('✓ Complaint updated successfully')
+      }
+
       // Log activity
-      await supabase.from('complaint_activities').insert([
+      console.log('📝 Logging activity...')
+      const { error: activityError } = await supabase.from('complaint_activities').insert([
         {
           complaint_id: assignmentData.complaint_id,
           activity_type: 'ASSIGNED',
-          description: 'Complaint assigned to campus coordinator',
-          performed_by: assignmentData.assigned_by,
+          description: `Complaint manually ${wasReassignment ? 'reassigned' : 'assigned'} to campus coordinator by admin. ${assignmentData.assignment_reason ? 'Reason: ' + assignmentData.assignment_reason : ''}`,
+          performed_by: cleanAssignedBy,
         }
       ])
 
-      return data
+      if (activityError) {
+        console.error('⚠️ Activity log error (non-critical):', activityError)
+        // This is not critical, assignment is already created
+      } else {
+        console.log('✓ Activity logged successfully')
+      }
+
+      console.log('=== ASSIGNMENT DEBUG END ===')
+      return { ...data, wasReassignment }
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['complaint-assignments'] })
       queryClient.invalidateQueries({ queryKey: ['complaints'] })
-      toast.success('Complaint assigned successfully')
+      
+      const message = data.wasReassignment ? 'Complaint reassigned successfully' : 'Complaint assigned successfully'
+      toast.success(message)
     },
     onError: (error: Error) => {
       toast.error('Failed to assign complaint', {
@@ -560,7 +668,7 @@ export function useAutoAssignComplaint() {
       await supabase
         .from('complaints')
         .update({ 
-          status: 'ASSIGNED',
+          status: COMPLAINT_WORKFLOW_STATUS.ASSIGNED_TO_CAMPUS_IC,
           assigned_to: assignedCoordinator,
           assigned_at: new Date().toISOString()
         })
@@ -745,7 +853,7 @@ export function useComplaintActivities(complaintId: string) {
   })
 }
 
-// Warden verification hook
+// Floor Incharge verification hook
 export function useFloorInchargeVerification() {
   const queryClient = useQueryClient()
 
@@ -764,21 +872,21 @@ export function useFloorInchargeVerification() {
       if (verified) {
         // Insert floor incharge authentication record
         const { error: authError } = await supabase
-          .from('warden_authentications')
+          .from('floor_incharge_authentications')
           .insert([{
             complaint_id: complaintId,
             floor_incharge_id: floorInchargeId,
-            is_verified: true,
-            verification_notes: notes,
-            verified_at: new Date().toISOString()
+            is_authenticated: true,
+            authentication_notes: notes,
+            authenticated_at: new Date().toISOString()
           }])
 
         if (authError) throw authError
 
-        // Update complaint status to verified
+        // Update complaint status to verified and pending admin assignment
         const { error: updateError } = await supabase
           .from('complaints')
-          .update({ status: COMPLAINT_WORKFLOW_STATUS.VERIFIED })
+          .update({ status: COMPLAINT_WORKFLOW_STATUS.PENDING_ADMIN_ASSIGNMENT })
           .eq('id', complaintId)
 
         if (updateError) throw updateError
@@ -788,13 +896,12 @@ export function useFloorInchargeVerification() {
           {
             complaint_id: complaintId,
             activity_type: 'VERIFIED',
-            description: `Complaint verified by floor incharge: ${notes}`,
+            description: `Complaint verified by floor incharge: ${notes}. Awaiting admin assignment.`,
             performed_by: floorInchargeId,
           }
         ])
 
-        // Auto-transition to cost estimation
-        await autoTransitionWorkflow(complaintId, COMPLAINT_WORKFLOW_STATUS.VERIFIED, floorInchargeId)
+        // No auto-assignment - admin will manually assign
 
       } else {
         // Reject the complaint
@@ -817,13 +924,13 @@ export function useFloorInchargeVerification() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['complaints'] })
-      queryClient.invalidateQueries({ queryKey: ['warden-authentications'] })
+      queryClient.invalidateQueries({ queryKey: ['floor-incharge-authentications'] })
       
       toast.success(
-        data.verified ? 'Complaint Verified & Auto-Assigned for Cost Estimation' : 'Complaint Rejected',
+        data.verified ? 'Complaint Verified - Awaiting Admin Assignment' : 'Complaint Rejected',
         {
           description: data.verified 
-            ? 'Complaint has been automatically moved to campus coordinator for cost estimation'
+            ? 'Complaint has been verified and is now pending admin assignment to a campus coordinator'
             : 'Complaint has been rejected and marked accordingly',
           duration: 5000,
         }

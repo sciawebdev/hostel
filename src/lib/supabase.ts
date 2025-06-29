@@ -26,8 +26,8 @@ export type Hostel = {
   name: string
   location: string | null
   total_floors: number
-  warden_name: string | null
-  warden_contact: string | null
+  floor_incharge_name: string | null
+  floor_incharge_contact: string | null
   created_at: string | null
   updated_at: string | null
 }
@@ -104,14 +104,14 @@ export type Complaint = {
   satisfaction_rating: number | null
   lessons_learned: string | null
   
-  // New workflow fields
-  warden_verification_status?: 'PENDING' | 'VERIFIED' | 'REJECTED'
-  warden_verified_by?: string | null
-  warden_verified_at?: string | null
+  // New workflow fields - updated for floor incharge
+  floor_incharge_verification_status?: 'PENDING' | 'VERIFIED' | 'REJECTED'
+  floor_incharge_verified_by?: string | null
+  floor_incharge_verified_at?: string | null
   work_completion_verified?: boolean
   work_verified_by?: string | null
   work_verified_at?: string | null
-  current_stage?: 'COMPLAINT_SUBMITTED' | 'WARDEN_VERIFICATION' | 'ASSIGNED_TO_CAMPUS_IC' | 'COST_ESTIMATION' | 'COST_APPROVAL' | 'WORK_IN_PROGRESS' | 'WORK_COMPLETED' | 'WARDEN_WORK_VERIFICATION' | 'FINAL_APPROVAL' | 'RESOLVED'
+  current_stage?: 'COMPLAINT_SUBMITTED' | 'FLOOR_INCHARGE_VERIFICATION' | 'ASSIGNED_TO_CAMPUS_IC' | 'COST_ESTIMATION' | 'COST_APPROVAL' | 'WORK_IN_PROGRESS' | 'WORK_COMPLETED' | 'FLOOR_INCHARGE_WORK_VERIFICATION' | 'FINAL_APPROVAL' | 'RESOLVED'
   
   // Joined relations
   hostels?: {
@@ -165,6 +165,7 @@ export const PRIORITY_LEVELS = {
 export const COMPLAINT_WORKFLOW_STATUS = {
   VERIFICATION_PENDING: 'VERIFICATION_PENDING',
   VERIFIED: 'VERIFIED',
+  PENDING_ADMIN_ASSIGNMENT: 'PENDING_ADMIN_ASSIGNMENT',
   ASSIGNED_TO_CAMPUS_IC: 'ASSIGNED_TO_CAMPUS_IC',
   COST_ESTIMATION_PENDING: 'COST_ESTIMATION_PENDING',
   PROPOSAL_SUBMITTED: 'PROPOSAL_SUBMITTED',

@@ -16,7 +16,7 @@ import {
   X
 } from 'lucide-react'
 import { useComplaint, useUpdateComplaintStatus, useAssignComplaint } from '../hooks/useComplaints'
-import { useCampusInChargeUsers } from '../hooks/useAuth'
+import { getCampusInChargeUsers } from './AuthProvider'
 import { toast } from 'sonner'
 
 interface ComplaintDetailsProps {
@@ -26,7 +26,7 @@ interface ComplaintDetailsProps {
 
 export function ComplaintDetails({ complaintId, onBack }: ComplaintDetailsProps) {
   const { data: complaint, isLoading } = useComplaint(complaintId)
-  const { data: campusCoordinators = [] } = useCampusInChargeUsers()
+  const campusCoordinators = getCampusInChargeUsers()
   const updateStatusMutation = useUpdateComplaintStatus()
   const assignMutation = useAssignComplaint()
 
@@ -142,7 +142,7 @@ export function ComplaintDetails({ complaintId, onBack }: ComplaintDetailsProps)
       return
     }
 
-    const staff = campusCoordinators.find(s => s.id === selectedStaff)
+    const staff = campusCoordinators.find((s: any) => s.id === selectedStaff)
     if (!staff) {
       toast.error('Selected campus coordinator not found')
       return
@@ -315,7 +315,7 @@ export function ComplaintDetails({ complaintId, onBack }: ComplaintDetailsProps)
                     className="block w-full border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="">Select campus coordinator</option>
-                    {campusCoordinators.map((coordinator) => (
+                    {campusCoordinators.map((coordinator: any) => (
                       <option key={coordinator.id} value={coordinator.id}>
                         {coordinator.name} - {coordinator.specialization}
                       </option>
