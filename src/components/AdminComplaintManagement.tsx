@@ -11,6 +11,7 @@ import {
   ThumbsUp,
   ThumbsDown,
   RotateCcw,
+  MessageCircle
 } from 'lucide-react'
 import { useComplaint } from '../hooks/useComplaints'
 import { useAuth } from './AuthProvider'
@@ -433,16 +434,36 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
                         Selected Coordinator Details
                       </label>
                       {selectedCoordinator ? (
-                        <div className="p-3 bg-purple-50 rounded-md">
+                        <div className="p-3 bg-purple-50 rounded-md space-y-2">
                           {(() => {
                             const coordinator = campusCoordinators.find(c => c.id === selectedCoordinator)
-                            return coordinator ? (
-                              <div className="text-sm">
+                            if (!coordinator) return null
+
+                            const cleanPhone = coordinator.contact?.replace(/\D/g, '') || ''
+                            const waNumber = cleanPhone.startsWith('91') || cleanPhone.length > 10 ? cleanPhone : `91${cleanPhone}`
+                            const waMessage = encodeURIComponent(
+                              `Hi ${coordinator.name}, you have been assigned a new complaint (ID: ${complaint.complaint_number}).\n\n` +
+                              `${complaint.description}\n\n` +
+                              (assignmentReason ? `Admin Instructions: ${assignmentReason}` : '') +
+                              `\n\nPlease review and proceed with cost estimation at your earliest convenience.`
+                            )
+                            const waLink = `https://wa.me/${waNumber}?text=${waMessage}`
+
+                            return (
+                              <div className="text-sm space-y-1">
                                 <p className="font-medium text-purple-900">{coordinator.name}</p>
                                 <p className="text-purple-700">📞 {coordinator.contact}</p>
                                 <p className="text-purple-700">📧 {coordinator.email}</p>
+                                <a
+                                  href={waLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center px-3 py-1.5 mt-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-xs"
+                                >
+                                  <MessageCircle className="h-4 w-4 mr-1" /> Open WhatsApp
+                                </a>
                               </div>
-                            ) : null
+                            )
                           })()}
                         </div>
                       ) : (

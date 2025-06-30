@@ -51,8 +51,8 @@ const demoUsers: User[] = [
   {
     id: 'campus-coord-1',
     email: 'coord1@saratchandra.co.in',
-    name: 'Ravi Kumar',
-    contact: '+91-9876543211',
+    name: 'Ashok Main Campus',
+    contact: '+91-9494483828',
     role_id: 'campus-ic-role',
     specialization: 'Godavari & Sarayu Hostels Coordinator',
     is_active: true,
@@ -78,8 +78,8 @@ const demoUsers: User[] = [
   {
     id: 'campus-coord-2',
     email: 'coord2@saratchandra.co.in',
-    name: 'Priya Sharma',
-    contact: '+91-9876543212',
+    name: 'Durgaprasad',
+    contact: '+91-8142229263',
     role_id: 'campus-ic-role',
     specialization: 'Ganga 1 & Ganga 2 Hostels Coordinator',
     is_active: true,
@@ -105,8 +105,8 @@ const demoUsers: User[] = [
   {
     id: 'campus-coord-3',
     email: 'coord3@saratchandra.co.in',
-    name: 'Amit Patel',
-    contact: '+91-9876543213',
+    name: 'Lakshmi Reddy',
+    contact: '+91-7989042989',
     role_id: 'campus-ic-role',
     specialization: 'Krishna & Narmada Hostels Coordinator',
     is_active: true,
@@ -132,8 +132,8 @@ const demoUsers: User[] = [
   {
     id: 'campus-coord-4',
     email: 'coord4@saratchandra.co.in',
-    name: 'Sunita Rao',
-    contact: '+91-9876543214',
+    name: 'Manikanta',
+    contact: '+91-7989441752',
     role_id: 'campus-ic-role',
     specialization: 'Bhramaputra 1 & Bhramaputra 2 Hostels Coordinator',
     is_active: true,
@@ -159,64 +159,10 @@ const demoUsers: User[] = [
   {
     id: 'campus-coord-5',
     email: 'coord5@saratchandra.co.in',
-    name: 'Vikram Singh',
-    contact: '+91-9876543215',
+    name: 'Raghu',
+    contact: '+91-8686189180',
     role_id: 'campus-ic-role',
     specialization: 'Saraswathi Hostel Coordinator',
-    is_active: true,
-    last_login: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    user_roles: {
-      id: 'campus-ic-role',
-      name: 'campus_in_charge',
-      description: 'Campus coordinator role',
-      permissions: {
-        view_assigned_complaints: true,
-        estimate_costs: true,
-        create_cost_estimates: true,
-        update_work_progress: true,
-        submit_bills: true,
-        view_own_statistics: true
-      },
-      created_at: new Date().toISOString()
-    }
-  },
-
-  {
-    id: 'campus-coord-6',
-    email: 'coord6@saratchandra.co.in',
-    name: 'Meera Gupta',
-    contact: '+91-9876543216',
-    role_id: 'campus-ic-role',
-    specialization: 'Civils Lt Girls Hostel Coordinator',
-    is_active: true,
-    last_login: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    user_roles: {
-      id: 'campus-ic-role',
-      name: 'campus_in_charge',
-      description: 'Campus coordinator role',
-      permissions: {
-        view_assigned_complaints: true,
-        estimate_costs: true,
-        create_cost_estimates: true,
-        update_work_progress: true,
-        submit_bills: true,
-        view_own_statistics: true
-      },
-      created_at: new Date().toISOString()
-    }
-  },
-
-  {
-    id: 'campus-coord-7',
-    email: 'coord7@saratchandra.co.in',
-    name: 'Arjun Nair',
-    contact: '+91-9876543217',
-    role_id: 'campus-ic-role',
-    specialization: 'Campus Coordinator',
     is_active: true,
     last_login: null,
     created_at: new Date().toISOString(),

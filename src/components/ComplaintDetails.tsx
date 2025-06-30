@@ -13,7 +13,8 @@ import {
   FileText,
   Edit3,
   Save,
-  X
+  X,
+  MessageCircle
 } from 'lucide-react'
 import { useComplaint, useUpdateComplaintStatus, useAssignComplaint } from '../hooks/useComplaints'
 import { getCampusInChargeUsers } from './AuthProvider'
@@ -36,6 +37,7 @@ export function ComplaintDetails({ complaintId, onBack }: ComplaintDetailsProps)
   const [resolutionNotes, setResolutionNotes] = useState('')
   const [selectedStaff, setSelectedStaff] = useState('')
   const [estimatedResolution, setEstimatedResolution] = useState('')
+  const [assignmentReason, setAssignmentReason] = useState('')
 
   if (isLoading) {
     return (
@@ -155,9 +157,21 @@ export function ComplaintDetails({ complaintId, onBack }: ComplaintDetailsProps)
         staffName: staff.name,
         estimatedResolution: estimatedResolution || undefined
       })
+
+      // Open WhatsApp chat with pre-filled message
+      const cleanPhone = staff.contact?.replace(/\D/g, '') || ''
+      const waNumber = cleanPhone.startsWith('91') || cleanPhone.length > 10 ? cleanPhone : `91${cleanPhone}`
+      const waMessage = encodeURIComponent(
+        `Hi ${staff.name}, you have been assigned a new complaint (ID: ${complaint.complaint_number}).\n\n` +
+        `${complaint.title}\n${complaint.description}\n\n` +
+        (assignmentReason ? `Admin Comments: ${assignmentReason}\n\n` : '') +
+        `Please review and proceed with cost estimation at your earliest convenience.`
+      )
+      window.open(`https://wa.me/${waNumber}?text=${waMessage}`,'_blank')
       setShowAssignment(false)
       setSelectedStaff('')
       setEstimatedResolution('')
+      setAssignmentReason('')
     } catch (error) {
       // Error handled by mutation
     }
@@ -324,16 +338,32 @@ export function ComplaintDetails({ complaintId, onBack }: ComplaintDetailsProps)
                 </div>
                 
                 <div>
-                  <label htmlFor="estimated" className="block text-sm font-medium text-gray-700 mb-2">
-                    Estimated Resolution Date (Optional)
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    🕒 Expected Resolution Time (Optional)
                   </label>
                   <input
-                    type="datetime-local"
-                    id="estimated"
+                    type="text"
                     value={estimatedResolution}
                     onChange={(e) => setEstimatedResolution(e.target.value)}
-                    className="block w-full border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="e.g., 48 hours"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    💬 Admin Comments / Instructions (sent via WhatsApp)
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={assignmentReason}
+                    onChange={(e) => setAssignmentReason(e.target.value)}
+                    className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="Explain why this coordinator is selected or any special guidance"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    These comments will be included in the pre-filled WhatsApp message.
+                  </p>
                 </div>
                 
                 <div className="flex items-center space-x-3">
@@ -354,6 +384,30 @@ export function ComplaintDetails({ complaintId, onBack }: ComplaintDetailsProps)
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {selectedStaff && (
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex items-start space-x-4">
+              {(() => {
+                const coord = campusCoordinators.find((c: any) => c.id === selectedStaff)
+                if (!coord) return null
+                const clean = coord.contact?.replace(/\D/g, '') || ''
+                const waNum = clean.startsWith('91') || clean.length > 10 ? clean : `91${clean}`
+                const msg = encodeURIComponent(`Hi ${coord.name}, you are being considered for a new complaint assignment.`)
+                const link = `https://wa.me/${waNum}?text=${msg}`
+                return (
+                  <>
+                    <div className="text-sm">
+                      <p className="font-medium text-purple-900">{coord.name}</p>
+                      <p className="text-purple-700">📞 {coord.contact}</p>
+                    </div>
+                    <a href={link} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 text-xs">
+                      <MessageCircle className="h-4 w-4 mr-1" /> WhatsApp
+                    </a>
+                  </>
+                )
+              })()}
             </div>
           )}
 
