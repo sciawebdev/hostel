@@ -5,6 +5,8 @@ import App from './App.tsx'
 import { toast } from 'sonner'
 // Vite PWA register helper
 import { registerSW } from 'virtual:pwa-register'
+// Firebase push notifications
+import { initializePushNotifications } from './lib/firebase'
 
 // Register the service worker for PWA capabilities
 registerSW({
@@ -23,6 +25,9 @@ registerSW({
     toast.success('App ready to work offline')
   },
 })
+
+// Initialize Firebase push notifications
+initializePushNotifications().catch(console.error)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

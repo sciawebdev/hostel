@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.sca.hostel"
+    namespace "com.saratchandraacademy.hostelmanagement"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.sca.hostel"
+        applicationId "com.saratchandraacademy.hostelmanagement"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -36,6 +36,11 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+    
+    // Firebase dependencies for push notifications
+    implementation 'com.google.firebase:firebase-messaging:23.4.1'
+    implementation 'com.google.firebase:firebase-analytics:21.5.1'
+    
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"

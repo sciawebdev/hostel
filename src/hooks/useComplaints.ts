@@ -3,6 +3,7 @@ import { supabase, COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
 import { queryKeys } from '../lib/react-query'
 import { toast } from 'sonner'
 import type { Complaint } from '../lib/supabase'
+import { ComplaintNotifications } from '../lib/notificationService'
 
 export function useComplaints() {
   return useQuery({
@@ -132,9 +133,16 @@ export function useUpdateComplaintStatus() {
           complaint_id: id,
           activity_type: 'STATUS_UPDATED',
           description: `Status changed to ${status}`,
-          performed_by: 'Admin', // TODO: Get from auth context
+          performed_by: 'admin-1', // TODO: Get from auth context
         }
       ])
+
+      // Send push notification for status update
+      try {
+        await ComplaintNotifications.onStatusUpdated(data, status, ['admin-1']) // TODO: Get actual recipients
+      } catch (notificationError) {
+        console.warn('Status update notification failed:', notificationError)
+      }
 
       return data
     },
@@ -210,9 +218,16 @@ export function useAssignComplaint() {
           complaint_id: complaintId,
           activity_type: 'ASSIGNED',
           description: `Assigned to ${staffName}`,
-          performed_by: 'Admin', // TODO: Get from auth context
+          performed_by: 'admin-1', // TODO: Get from auth context
         }
       ])
+
+      // Send push notification for assignment
+      try {
+        await ComplaintNotifications.onComplaintAssigned({ id: complaintId }, staffMemberId)
+      } catch (notificationError) {
+        console.warn('Assignment notification failed:', notificationError)
+      }
 
       return { complaintId, staffMemberId }
     },

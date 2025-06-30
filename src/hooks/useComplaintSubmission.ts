@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
 import { queryKeys } from '../lib/react-query'
 import { toast } from 'sonner'
+import { ComplaintNotifications } from '../lib/notificationService'
 
 export interface ComplaintSubmissionData {
   hostel_id: string
@@ -261,6 +262,29 @@ export function useComplaintSubmission() {
       } catch (assignmentError) {
         console.warn('Assignment failed but complaint created:', assignmentError)
         // Don't fail the entire submission if assignment fails
+      }
+
+      // Send push notifications for new complaint
+      try {
+        await ComplaintNotifications.onComplaintSubmitted({
+          ...result,
+          hostel: { name: data.hostel_id },
+          room: { room_number: data.room_text },
+          category: data.category_id
+        })
+        
+        // Send urgent notification if high priority
+        if (data.urgency_level >= 4) {
+          await ComplaintNotifications.onUrgentComplaint({
+            ...result,
+            hostel: { name: data.hostel_id },
+            room: { room_number: data.room_text },
+            category: data.category_id
+          })
+        }
+      } catch (notificationError) {
+        console.warn('Notification sending failed:', notificationError)
+        // Don't fail the submission if notifications fail
       }
 
       return { ...result, numberBreakdown: metadata }

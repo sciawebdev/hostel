@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "43227706036",
+    "project_id": "sca-hostel-management-2219e",
+    "storage_bucket": "sca-hostel-management-2219e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:43227706036:android:06904f5eeb32fdb618dde1",
+        "android_client_info": {
+          "package_name": "com.saratchandraacademy.hostelmanagement"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsaDCtwUNEsxrjG-7ugrXx36rGT12F5GY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
