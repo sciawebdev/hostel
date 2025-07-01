@@ -118,10 +118,10 @@ export async function subscribeToNotificationTopic(topic: string) {
 export const NOTIFICATION_TEMPLATES = {
   NEW_COMPLAINT: {
     title: "🆕 New Complaint Submitted",
-    body: (complaint: any) => `${complaint.complaint_id}: ${complaint.category} in ${complaint.hostel?.name} Room ${complaint.room?.room_number}`,
+    body: (complaint: any) => `${complaint.complaint_number || complaint.complaint_id}: ${complaint.category} in ${complaint.hostel?.name} Room ${complaint.room?.room_number || complaint.room_number} - Pending your verification`,
     data: (complaint: any) => ({
       type: 'new_complaint',
-      complaint_id: complaint.complaint_id,
+      complaint_id: complaint.complaint_id || complaint.id,
       action: 'OPEN_COMPLAINT_DETAILS'
     })
   },
@@ -137,11 +137,11 @@ export const NOTIFICATION_TEMPLATES = {
   },
   
   WORK_COMPLETED: {
-    title: "✅ Work Completed",
-    body: (complaint: any) => `${complaint.complaint_id}: Work completed, verification needed`,
+    title: "✅ Work Completed - Verification Needed",
+    body: (complaint: any) => `${complaint.complaint_number || complaint.complaint_id}: Work completed in ${complaint.hostel?.name || complaint.hostels?.name} - Please verify work quality`,
     data: (complaint: any) => ({
       type: 'work_completed',
-      complaint_id: complaint.complaint_id,
+      complaint_id: complaint.complaint_id || complaint.id,
       action: 'OPEN_VERIFICATION'
     })
   },

@@ -3,6 +3,7 @@ import { supabase, COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
 import { queryKeys } from '../lib/react-query'
 import { toast } from 'sonner'
 import { ComplaintNotifications } from '../lib/notificationService'
+import { useOfflineSync } from '../lib/offlineSync'
 
 export interface ComplaintSubmissionData {
   hostel_id: string
@@ -161,11 +162,28 @@ const getPriorityDescription = (code: string) => {
 
 export function useComplaintSubmission() {
   const queryClient = useQueryClient()
+  const { isOnline, saveOffline } = useOfflineSync()
 
   return useMutation({
     mutationFn: async (data: ComplaintSubmissionData) => {
-      // Show immediate loading feedback
-      toast.loading('Submitting complaint...', { id: 'complaint-submit' })
+      // Check if we're offline
+      if (!isOnline) {
+        const offlineId = await saveOffline(data)
+        return {
+          id: offlineId,
+          complaint_number: offlineId,
+          status: 'pending_sync',
+          offline: true,
+          numberBreakdown: {
+            hostel_code: data.hostel_id.substring(0, 2).toUpperCase(),
+            sequence: 'OFFLINE',
+            year: new Date().getFullYear().toString().slice(-2)
+          }
+        }
+      }
+
+      // Show loading toast for network submission
+      toast.loading('Creating complaint...', { id: 'complaint-submit' })
 
       // Generate simple complaint number (hostel prefix + serial)
       const { complaintNumber, metadata } = await generateSimpleComplaintNumber(data.hostel_id)

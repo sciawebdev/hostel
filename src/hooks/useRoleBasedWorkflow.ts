@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
 import { toast } from 'sonner'
+import { ComplaintNotifications } from '../lib/notificationService'
 import type { 
   CostApproval, 
   FloorInchargeAuthentication, 
@@ -51,7 +52,7 @@ async function autoTransitionWorkflow(complaintId: string, currentStage: Complai
 
       case COMPLAINT_WORKFLOW_STATUS.WORK_DONE:
         nextStage = COMPLAINT_WORKFLOW_STATUS.WORK_VERIFICATION_PENDING
-        activityDescription = 'Work is done, awaiting Warden verification.'
+        activityDescription = 'Work is done, awaiting Floor Incharge verification.'
         break
         
       case COMPLAINT_WORKFLOW_STATUS.WORK_VERIFIED:
@@ -76,6 +77,23 @@ async function autoTransitionWorkflow(complaintId: string, currentStage: Complai
           performed_by: `System (triggered by ${triggeredBy})`,
         }
       ])
+
+      // Send notifications for specific status changes
+      if (nextStage === COMPLAINT_WORKFLOW_STATUS.WORK_VERIFICATION_PENDING) {
+        // Get complaint details to send notification to floor incharge
+        const { data: complaint } = await supabase
+          .from('complaints')
+          .select('*, hostels(name)')
+          .eq('id', complaintId)
+          .single()
+
+        if (complaint) {
+          await ComplaintNotifications.onWorkVerificationNeeded({
+            ...complaint,
+            hostel: complaint.hostels ? { name: complaint.hostels.name } : null
+          })
+        }
+      }
 
       console.log(`Auto-transitioned complaint ${complaintId} from ${currentStage} to ${nextStage}`)
     }

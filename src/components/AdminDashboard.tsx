@@ -7,13 +7,16 @@ import {
   Clock, 
   Building,
   Search,
-  DollarSign
+  DollarSign,
+  Bell
 } from 'lucide-react'
 import { ComplaintsList } from './index'
 import { AdminComplaintManagement } from './index'
 import { DashboardStats } from './index'
 import { useComplaints } from '../hooks/useComplaints'
 import { COMPLAINT_WORKFLOW_STATUS } from '../lib/supabase'
+import { NotificationService } from '../lib/notificationService'
+import { toast } from 'sonner'
 
 type TabType = 'overview' | 'all' | 'pending' | 'cost-approval' | 'in-progress' | 'resolved'
 
@@ -22,6 +25,7 @@ export function AdminDashboard() {
   const [selectedComplaintId, setSelectedComplaintId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedHostel, setSelectedHostel] = useState<string>('')
+  const [isLoadingTest, setIsLoadingTest] = useState(false)
 
   const { data: complaints = [], isLoading } = useComplaints()
 
@@ -43,6 +47,59 @@ export function AdminDashboard() {
       if (tab === 'resolved') return complaint.status === COMPLAINT_WORKFLOW_STATUS.RESOLVED || complaint.status === COMPLAINT_WORKFLOW_STATUS.CLOSED
       return false
     })
+  }
+
+  const handleTestNotification = async () => {
+    try {
+      await NotificationService.sendTestNotification()
+      toast.success('Test notification sent! Check your device.')
+    } catch (error) {
+      console.error('Failed to send test notification:', error)
+      toast.error('Failed to send test notification')
+    }
+  }
+
+  const testFCMNotification = async () => {
+    try {
+      setIsLoadingTest(true)
+      console.log('🧪 Testing FCM notification system...')
+      
+      // Test using static method
+      await NotificationService.sendTestNotification()
+      
+      // Additional manual test with different scenarios
+      console.log('📱 FCM Test completed - check device notifications and console')
+      
+      toast.success('FCM test notification sent! Check your device notification tray and console logs.')
+      
+    } catch (error) {
+      console.error('❌ FCM test failed:', error)
+      toast.error('FCM test failed. Check console for details.')
+    } finally {
+      setIsLoadingTest(false)
+    }
+  }
+
+  const checkFCMStatus = async () => {
+    try {
+      console.log('🔍 FCM System Status Check:', {
+        isCapacitorNative: typeof window !== 'undefined' && 'Capacitor' in window,
+        notificationSupport: 'Notification' in window,
+        timestamp: new Date().toISOString()
+      })
+      
+      // Test if notifications are supported
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        const permission = Notification.permission
+        toast.info(`FCM Status Check: Notification permission is ${permission}`)
+      } else {
+        toast.warning('Notifications not supported in this browser')
+      }
+      
+    } catch (error) {
+      console.error('❌ FCM status check failed:', error)
+      toast.error('Failed to check FCM status')
+    }
   }
 
   const filteredComplaints = getComplaintsByTab(activeTab).filter(complaint => {
@@ -80,6 +137,14 @@ export function AdminDashboard() {
             </div>
             
             <div className="flex items-center space-x-4">
+              <button
+                onClick={handleTestNotification}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <Bell className="h-4 w-4" />
+                <span>Test Notification</span>
+              </button>
+              
               <div className="relative">
                 <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
                 <input
@@ -150,6 +215,25 @@ export function AdminDashboard() {
             onHostelChange={setSelectedHostel}
           />
         )}
+
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <div className="flex gap-2">
+            <button
+              onClick={checkFCMStatus}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              📊 Check FCM Status
+            </button>
+            <button
+              onClick={testFCMNotification}
+              disabled={isLoadingTest}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+            >
+              {isLoadingTest ? '⏳ Testing...' : '🔔 Test FCM Notification'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

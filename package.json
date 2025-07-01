@@ -17,6 +17,7 @@
   "dependencies": {
     "@capacitor/android": "^7.3.0",
     "@capacitor/core": "^7.3.0",
+    "@capacitor/local-notifications": "^7.0.1",
     "@capacitor/push-notifications": "^7.0.1",
     "@hookform/resolvers": "^5.1.1",
     "@supabase/supabase-js": "^2.50.0",

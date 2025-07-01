@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, type ReactNode, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { toast } from 'sonner'
+import { NotificationService } from '../lib/notificationService'
 import type { User, AuthContextType } from '../types/auth'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -497,7 +498,128 @@ export const getFloorIncharges = (hostelId?: string): User[] => {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true) // Start with true to check for existing session
+  const [initializing, setInitializing] = useState(true)
+
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      try {
+        console.log('🔍 Checking for existing session...')
+        
+        // Get current session from Supabase
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('Session check error:', error)
+          return
+        }
+
+        if (session?.user) {
+          console.log('✅ Found existing session for user:', session.user.email)
+          
+          // Get user data from app_users table
+          const { data: userData, error: userError } = await supabase
+            .from('app_users')
+            .select(`
+              *,
+              user_roles (
+                id,
+                name,
+                description,
+                permissions
+              ),
+              hostels (
+                id,
+                name,
+                location
+              )
+            `)
+            .eq('email', session.user.email)
+            .eq('is_active', true)
+            .single()
+
+          if (!userError && userData) {
+            console.log('✅ User data loaded from database')
+            setUser(userData as User)
+            
+            // Initialize notifications for existing session
+            try {
+                             await NotificationService.initialize({
+                 userId: userData.id,
+                 userRole: userData.user_roles?.name || 'student',
+                 ...(userData.hostels?.name && { hostelName: userData.hostels.name }),
+                 enableLogging: true
+               })
+              
+              console.log('📱 Notification service initialized for existing session')
+            } catch (notificationError) {
+              console.warn('Failed to initialize notifications for existing session:', notificationError)
+            }
+          } else {
+            console.log('🔍 No user data found for session, falling back to demo users')
+            
+            // Fall back to demo users if database user not found
+            const demoUser = demoUsers.find(u => u.email === session.user.email)
+            if (demoUser) {
+              setUser(demoUser)
+              
+                             // Initialize notifications for demo user
+               try {
+                 await NotificationService.initialize({
+                   userId: demoUser.id,
+                   userRole: demoUser.user_roles?.name || 'student',
+                   ...(demoUser.hostel_id && { hostelName: demoUser.hostel_id }),
+                   enableLogging: true
+                 })
+               } catch (notificationError) {
+                 console.warn('Failed to initialize notifications:', notificationError)
+               }
+            }
+          }
+        } else {
+          console.log('ℹ️ No existing session found')
+        }
+      } catch (error) {
+        console.error('Error checking existing session:', error)
+      } finally {
+        setInitializing(false)
+        setIsLoading(false)
+      }
+    }
+
+    checkExistingSession()
+  }, [])
+
+  // Monitor session changes
+  useEffect(() => {
+    console.log('🔧 Setting up session monitoring...')
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('🔄 Auth state changed:', event, session?.user?.email || 'No user')
+        
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('✅ User signed in, maintaining session...')
+          // Session is maintained automatically by existing login logic
+        } else if (event === 'SIGNED_OUT') {
+          console.log('👋 User signed out')
+          setUser(null)
+        } else if (event === 'TOKEN_REFRESHED') {
+          console.log('🔄 Token refreshed, maintaining session...')
+          // Session continues, no action needed
+        } else if (event === 'USER_UPDATED') {
+          console.log('👤 User data updated')
+          // Re-fetch user data if needed
+        }
+      }
+    )
+
+    return () => {
+      console.log('🧹 Cleaning up session monitoring')
+      subscription.unsubscribe()
+    }
+  }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
@@ -541,7 +663,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const demoUser = demoUsers.find(u => u.email === email)
           if (demoUser) {
             setUser(demoUser)
-            toast.success(`Welcome, ${demoUser.name}!`)
+            
+            // Initialize and subscribe to notifications
+            try {
+              await NotificationService.initialize({
+                userId: demoUser.id,
+                userRole: demoUser.user_roles?.name || 'student',
+                ...(demoUser.hostel_id && { hostelName: demoUser.hostel_id }),
+                enableLogging: true
+              })
+            } catch (notificationError) {
+              console.warn('Failed to initialize notifications:', notificationError)
+            }
+            
+            toast.success(`Welcome back, ${demoUser.name}!`)
             return true
           }
         }
@@ -561,6 +696,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
               name,
               description,
               permissions
+            ),
+            hostels (
+              id,
+              name,
+              location
             )
           `)
           .eq('email', email)
@@ -585,7 +725,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
 
         setUser(userData as User)
-        toast.success(`Welcome, ${userData.name}!`)
+        
+        // Initialize and subscribe to notifications
+        try {
+          await NotificationService.initialize({
+            userId: userData.id,
+            userRole: userData.user_roles?.name || 'student',
+            ...(userData.hostels?.name && { hostelName: userData.hostels.name }),
+            enableLogging: true
+          })
+        } catch (notificationError) {
+          console.warn('Failed to initialize notifications:', notificationError)
+        }
+        
+        toast.success(`Welcome back, ${userData.name}!`)
         return true
       }
       
@@ -603,13 +756,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = () => {
-    console.log('Logout function called')
+    console.log('👋 Manual logout initiated')
     try {
-      // Sign out from Supabase Auth
+      // Sign out from Supabase Auth (this will trigger the auth state change)
       supabase.auth.signOut()
       setUser(null)
       toast.success('Logged out successfully')
-      console.log('Logout successful')
+      console.log('✅ Manual logout successful')
     } catch (error) {
       console.error('Logout error:', error)
       toast.error('Logout failed')
@@ -626,7 +779,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     logout,
     hasPermission,
-    isLoading
+    isLoading: isLoading || initializing
+  }
+
+  // Show loading screen while checking for existing session
+  if (initializing) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking existing session...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

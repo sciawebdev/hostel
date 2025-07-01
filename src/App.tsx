@@ -7,6 +7,7 @@ import { SimpleComplaintForm } from './pages'
 import { Navigation } from './components/Navigation'
 import { RoleBasedDashboard } from './components/RoleBasedDashboard'
 import { AuthProvider } from './components/AuthProvider'
+import { OfflineIndicator } from './components/OfflineIndicator'
 
 function App() {
   return (
@@ -31,6 +32,9 @@ function App() {
               </Routes>
             </main>
           </div>
+
+          {/* Offline sync indicator */}
+          <OfflineIndicator />
 
           {/* Modern Toast notifications */}
           <Toaster 
