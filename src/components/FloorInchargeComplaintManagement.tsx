@@ -138,22 +138,22 @@ export function FloorInchargeComplaintManagement({ complaintId, onBack }: FloorI
   const canVerifyWork = complaint.status === COMPLAINT_WORKFLOW_STATUS.WORK_VERIFICATION_PENDING && !hasFloorInchargeVerified
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="max-w-6xl mx-auto p-6">
-        <button onClick={onBack} className="flex items-center text-gray-600 hover:text-gray-900 mb-6">
+    <div className="min-h-screen bg-gray-50 pt-20 w-full overflow-x-auto">
+      <div className="max-w-6xl w-full mx-auto p-2 sm:p-6">
+        <button onClick={onBack} className="flex items-center text-gray-600 hover:text-gray-900 mb-4 sm:mb-6">
           <ArrowLeft className="h-5 w-5 mr-2" />
           Back to dashboard
         </button>
 
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-white rounded-lg shadow w-full max-w-full overflow-x-auto">
           {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900">Floor Incharge Verification</h2>
-            <p className="text-gray-600 mt-2">Complaint #{complaint.complaint_number}</p>
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <h2 className="text-base sm:text-xl font-bold text-gray-900 truncate">Floor Incharge Verification</h2>
+            <p className="text-gray-600 mt-1 sm:mt-2 text-xs sm:text-base truncate">Complaint #{complaint.complaint_number}</p>
             
             {/* Tab Navigation */}
-            <div className="mt-4 border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8">
+            <div className="mt-2 sm:mt-4 border-b border-gray-200 overflow-x-auto">
+              <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200">
                 {[
                   { id: 'details', label: 'Complaint Details' },
                   { id: 'verify', label: 'Verify Complaint', disabled: !canVerifyComplaint },
@@ -163,13 +163,14 @@ export function FloorInchargeComplaintManagement({ complaintId, onBack }: FloorI
                     key={tab.id}
                     onClick={() => !tab.disabled && setActiveTab(tab.id as any)}
                     disabled={tab.disabled}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                      activeTab === tab.id
+                    className={`py-2 sm:py-3 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap
+                      ${activeTab === tab.id
                         ? 'border-blue-500 text-blue-600'
                         : tab.disabled
                         ? 'border-transparent text-gray-400 cursor-not-allowed'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
+                      }
+                    `}
                   >
                     {tab.label}
                   </button>

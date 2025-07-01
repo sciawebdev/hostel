@@ -56,17 +56,17 @@ export function CampusInChargeDashboard() {
   return (
     <div className="min-h-screen bg-gray-100 pt-28">
       {/* Header */}
-      <div className="bg-white shadow-sm relative z-[60]">
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between h-auto sm:h-16 space-y-2 sm:space-y-0 w-full">
+            <div className="flex items-center space-x-4 w-full min-w-0">
               <BarChart3 className="h-8 w-8 text-blue-600" />
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">Campus In-Charge Dashboard</h1>
                 <p className="text-sm text-gray-500">Managing complaints for your area</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end min-w-0">
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                 <p className="text-xs text-gray-500">Campus In-Charge</p>
@@ -77,13 +77,13 @@ export function CampusInChargeDashboard() {
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
-            </button>
+              </button>
             </div>
           </div>
         </div>
       </div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <div className="bg-white p-6 rounded-lg shadow border-l-4 border-orange-500">
@@ -128,8 +128,8 @@ export function CampusInChargeDashboard() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+        <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+          <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200">
             {tabs.map((tab) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.id

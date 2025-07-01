@@ -283,7 +283,7 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
 
         <div className="bg-white rounded-lg shadow">
           <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Administrator Review</h2>
                 <p className="text-gray-600 mt-2">Complaint #{complaint.complaint_number} - Status: {complaint.status}</p>
@@ -292,15 +292,15 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
               {/* Current Stage Indicator */}
               <div className="flex items-center space-x-3">
                 {getStageIcon(complaint.status || '')}
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStageColor(complaint.status || '')}`}>
+                <span className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium truncate max-w-[140px] sm:max-w-none ${getStageColor(complaint.status || '')}`}>
                   {complaint.status?.replace(/_/g, ' ') || 'Unknown'}
                 </span>
               </div>
             </div>
             
             {/* Tab Navigation */}
-            <div className="mt-4 border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8">
+            <div className="mt-4 border-b border-gray-200 overflow-x-auto">
+              <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200">
                 {[
                   { id: 'details', label: 'Complaint Details' },
                   { id: 'assignment', label: 'Assign/Reassign Coordinator', disabled: !canAssign },
@@ -312,7 +312,7 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
                     key={tab.id}
                     onClick={() => !tab.disabled && setActiveTab(tab.id as any)}
                     disabled={tab.disabled}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    className={`py-2 sm:py-3 px-1 border-b-2 font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600'
                         : tab.disabled
@@ -320,7 +320,7 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    {tab.label}
+                    <span className="truncate">{tab.label}</span>
                   </button>
                 ))}
               </nav>
@@ -713,19 +713,21 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
                 {floorInchargeAuthentications.length > 0 && (
                   <div className="bg-blue-50 p-4 rounded-lg space-y-3">
                     <h4 className="font-medium text-gray-900">🏠 Floor Incharge Quality Verification:</h4>
-                    {floorInchargeAuthentications.map((auth: any, index: number) => {
+                    {floorInchargeAuthentications.slice().reverse().map((auth: any, index: number) => {
+                      // Chronological labelling: oldest = Verification 1
+                      const displayIndex = index + 1;
                       let verificationData = null;
                       try {
                         verificationData = JSON.parse(auth.authentication_notes || '{}');
                       } catch (e) {
                         verificationData = { additional_comments: auth.authentication_notes };
                       }
-                      
+
                       return (
                         <div key={auth.id} className="bg-white border border-blue-200 rounded-md p-3">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-medium text-blue-800">
-                              Verification {index + 1} - {auth.authenticated_at ? new Date(auth.authenticated_at).toLocaleString() : 'N/A'}
+                              Verification {displayIndex} - {auth.authenticated_at ? new Date(auth.authenticated_at).toLocaleString() : 'N/A'}
                             </span>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                               auth.is_authenticated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -733,16 +735,18 @@ export function AdminComplaintManagement({ complaintId, onBack }: AdminComplaint
                               {auth.is_authenticated ? '✅ Verified' : '❌ Rejected'}
                             </span>
                           </div>
-                          
+
                           <div className="space-y-2 text-sm">
                             {verificationData.student_signature_obtained !== undefined && (
                               <p className="text-gray-600">
-                                <span className="font-medium">Student Signature:</span> {verificationData.student_signature_obtained ? '✅ Obtained' : '❌ Not Obtained'}
+                                <span className="font-medium">Student Signature:</span>{' '}
+                                {verificationData.student_signature_obtained ? '✅ Obtained' : '❌ Not Obtained'}
                               </p>
                             )}
                             {verificationData.work_satisfactory !== undefined && (
                               <p className="text-gray-600">
-                                <span className="font-medium">Work Quality:</span> {verificationData.work_satisfactory ? '✅ Satisfactory' : '❌ Needs Improvement'}
+                                <span className="font-medium">Work Quality:</span>{' '}
+                                {verificationData.work_satisfactory ? '✅ Satisfactory' : '❌ Needs Improvement'}
                               </p>
                             )}
                             {verificationData.additional_comments && (

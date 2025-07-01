@@ -71,25 +71,24 @@ export function FloorInchargeDashboard() {
       {/* Header */}
       <div className="bg-blue-600 shadow-sm relative z-[60]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Shield className="h-8 w-8 text-white" />
-              <div>
-                <h1 className="text-xl font-semibold text-white">Floor Incharge Dashboard</h1>
-                <p className="text-sm text-blue-100">
-                  {user?.hostels?.name ? `${user.hostels.name} - ${user.hostels.location}` : 'All Hostels'}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between h-auto sm:h-16 space-y-2 sm:space-y-0 w-full">
+            <div className="flex items-center space-x-4 w-full min-w-0">
+              <Shield className="h-8 w-8 text-white flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-lg font-semibold text-white truncate max-w-[160px] sm:max-w-none">Floor Incharge Dashboard</h1>
+                <p className="text-xs sm:text-sm text-blue-100 truncate max-w-[120px] sm:max-w-none">
+                  {user?.hostels?.location ? user.hostels.location : 'All Hostels'}
                 </p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-white">{user?.name}</p>
-                <p className="text-xs text-blue-100">Floor Incharge</p>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end min-w-0">
+              <div className="text-right min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-white truncate max-w-[100px] sm:max-w-none">{user?.name}</p>
+                <p className="text-xs text-blue-100 truncate">Floor Incharge</p>
               </div>
               <button
                 onClick={logout}
-                className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-100 hover:text-white hover:bg-blue-700 rounded-md transition-colors"
+                className="flex items-center space-x-2 px-3 py-2 text-xs sm:text-sm text-blue-100 hover:text-white hover:bg-blue-700 rounded-md transition-colors"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
@@ -134,8 +133,8 @@ export function FloorInchargeDashboard() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+        <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+          <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200">
             {tabs.map((tab) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.id
@@ -145,15 +144,16 @@ export function FloorInchargeDashboard() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`
-                    group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm
+                    group inline-flex items-center py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm
                     ${isActive 
                       ? 'border-blue-500 text-blue-600' 
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }
+                    truncate max-w-[120px] sm:max-w-none
                   `}
                 >
                   <Icon className={`
-                    -ml-0.5 mr-2 h-5 w-5
+                    -ml-0.5 mr-2 h-4 w-4 sm:h-5 sm:w-5
                     ${isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}
                   `} />
                   {tab.label}

@@ -107,25 +107,24 @@ export function AdminRoleDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 pt-28">
       {/* Header */}
-      <div className="bg-blue-600 shadow-sm relative z-[60]">
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Shield className="h-8 w-8 text-white" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between h-auto sm:h-16 space-y-2 sm:space-y-0 w-full">
+            <div className="flex items-center space-x-4 w-full min-w-0">
+              <Shield className="h-8 w-8 text-blue-600" />
               <div>
-                <h1 className="text-xl font-semibold text-white">Administrator Dashboard</h1>
-                <p className="text-sm text-blue-100">Welcome back, {user?.name}</p>
+                <h1 className="text-xl font-semibold text-gray-900">Administrator Dashboard</h1>
+                <p className="text-sm text-gray-500">Welcome back, {user?.name}</p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end min-w-0">
               <div className="text-right">
-                <p className="text-sm font-medium text-white">{user?.name}</p>
-                <p className="text-xs text-blue-100">{user?.user_roles?.name.replace('_', ' ').toUpperCase()}</p>
+                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                <p className="text-xs text-gray-500">{user?.user_roles?.name.replace('_', ' ').toUpperCase()}</p>
               </div>
               <button
                 onClick={logout}
-                className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-100 hover:text-white hover:bg-blue-700 rounded-md transition-colors"
+                className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 rounded-md transition-colors"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
@@ -182,8 +181,8 @@ export function AdminRoleDashboard() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+        <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+          <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200">
             {tabs.map((tab) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.id
@@ -207,7 +206,7 @@ export function AdminRoleDashboard() {
                   {tab.label}
                   {tab.count !== undefined && (
                     <span className={`
-                      ml-2 py-0.5 px-2 rounded-full text-xs
+                      hidden sm:inline-flex ml-2 py-0.5 px-2 rounded-full text-xs
                       ${isActive 
                         ? 'bg-blue-100 text-blue-600' 
                         : 'bg-gray-100 text-gray-600'

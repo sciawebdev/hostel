@@ -164,7 +164,7 @@ export function SimpleComplaintForm() {
               <option value="" disabled>Select campus / hostel...</option>
               {hostels?.map(h => (
                 <option key={h.id} value={h.id} className="bg-primary-900 text-white">
-                  {h.name} ({h.location})
+                  {h.location}
                 </option>
               ))}
             </select>

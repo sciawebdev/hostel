@@ -126,8 +126,8 @@ export function CampusInChargeComplaintManagement({ complaintId, onBack }: Campu
             <p className="text-gray-600 mt-2">Complaint #{complaint.complaint_number} - Status: {complaint.status}</p>
             
             {/* Tab Navigation */}
-            <div className="mt-4 border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8">
+            <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+              <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200">
                 {[
                   { id: 'details', label: 'Complaint Details' },
                   { id: 'cost-estimate', label: 'Cost Estimate', disabled: !canEstimateCost },

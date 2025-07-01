@@ -112,10 +112,10 @@ export function ComplaintsList({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-full overflow-x-auto">
       {/* Filter Controls */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border">
-        <div className="flex items-center space-x-4">
+      <div className="bg-white p-4 rounded-lg shadow-sm border w-full max-w-full overflow-x-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full">
           <Filter className="h-5 w-5 text-gray-400" />
           <div className="flex-1">
             <label htmlFor="hostel-filter" className="sr-only">Filter by hostel</label>
@@ -149,24 +149,24 @@ export function ComplaintsList({
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full max-w-full overflow-x-auto">
           {complaints.map((complaint) => (
             <div 
               key={complaint.id} 
-              className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow cursor-pointer w-full max-w-full overflow-x-auto"
               onClick={() => onSelectComplaint(complaint.id)}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col sm:flex-row items-start justify-between w-full max-w-full overflow-x-auto">
                 <div className="flex-1 min-w-0">
                   {/* Header */}
-                  <div className="flex items-center space-x-3 mb-2">
+                  <div className="flex items-center space-x-3 mb-2 flex-wrap gap-2">
                     <span className="font-mono text-sm font-medium text-gray-900">
                       {complaint.complaint_number}
                     </span>
                     <div className="flex items-center space-x-2">
                       {getStatusIcon(complaint.status || 'PENDING')}
                       <span className={`
-                        inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium truncate max-w-[120px]
                         ${getStatusColor(complaint.status || 'PENDING')}
                       `}>
                         {complaint.status || 'PENDING'}
@@ -191,7 +191,7 @@ export function ComplaintsList({
                   </p>
 
                   {/* Details */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm w-full max-w-full overflow-x-auto">
                     <div className="flex items-center text-gray-500">
                       <User className="h-4 w-4 mr-2" />
                       <span className="truncate">{complaint.student_name}</span>
@@ -245,7 +245,7 @@ export function ComplaintsList({
                 </div>
 
                 {/* Action Button */}
-                <div className="ml-4 flex-shrink-0">
+                <div className="ml-0 sm:ml-4 flex-shrink-0 mt-4 sm:mt-0 w-full sm:w-auto">
                   <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <Eye className="h-4 w-4 mr-2" />
                     View

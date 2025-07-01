@@ -41,9 +41,8 @@ async function autoTransitionWorkflow(complaintId: string, currentStage: Complai
         break
 
       case COMPLAINT_WORKFLOW_STATUS.PROPOSAL_SUBMITTED:
-        nextStage = COMPLAINT_WORKFLOW_STATUS.PROPOSAL_APPROVED // Or a pending state
-        activityDescription = 'Proposal submitted, awaiting Admin approval.'
-        break
+        // Awaiting administrator approval – do not auto-transition.
+        return;
         
       case COMPLAINT_WORKFLOW_STATUS.PROPOSAL_APPROVED:
         nextStage = COMPLAINT_WORKFLOW_STATUS.WORK_IN_PROGRESS
